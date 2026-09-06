@@ -58,7 +58,7 @@ export function UniversalInbox({
     onBusy("inbox");
     onMessage(null);
     try {
-      const items = await ingestFiles(files, role, setProgress);
+      const items = await ingestFiles(files, role, setProgress, flow.year);
       setQueue((prev) => [...prev, ...items]);
       const errors = items.filter((i) => i.error).length;
       onMessage({

@@ -24,10 +24,18 @@ function receiptClass(role: FilerRole | null): EvidenceClass {
   return suggestedOcrClassification(role);
 }
 
+function classFromText(text: string, role: FilerRole | null, fallback: EvidenceClass): EvidenceClass {
+  const t = text.toLowerCase();
+  if (/bon fiscal|chitan[tț]a/.test(t)) return suggestedOcrClassification(role);
+  if (/factur/.test(t)) return suggestedIncomeClassification(role);
+  return fallback;
+}
+
 async function ingestOne(
   file: File,
   role: FilerRole | null,
   onProgress?: (p: { percent: number; status: string }) => void,
+  year?: number,
 ): Promise<IngestCandidate[]> {
   assertFileSize(file);
   const route = routeFile(file);
@@ -58,7 +66,7 @@ async function ingestOne(
           amount: draft.amount,
           date: draft.date,
           description: draft.merchant || file.name,
-          classification: receiptClass(role),
+          classification: classFromText(draft.rawText, role, receiptClass(role)),
           confidence: draft.confidence,
           rawText: draft.rawText,
           previewUrl: draft.previewUrl,
@@ -89,7 +97,8 @@ async function ingestOne(
   if (route === "csv") {
     const text = await file.text();
     const parsed = csvToCandidates(text, file.name, incomeClass(role));
-    return parsed.candidates;
+    if (!year) return parsed.candidates;
+    return parsed.candidates.filter((c) => !c.date || c.date.startsWith(String(year)));
   }
 
   if (route === "xlsx") {
@@ -163,6 +172,7 @@ export async function ingestFiles(
   files: File[],
   role: FilerRole | null,
   onProgress?: (p: IngestProgress) => void,
+  year?: number,
 ): Promise<IngestCandidate[]> {
   const out: IngestCandidate[] = [];
   for (let i = 0; i < files.length; i += 1) {
@@ -174,14 +184,18 @@ export async function ingestFiles(
       percent: Math.round((i / files.length) * 100),
       status: `Se citește ${file.name} (${i + 1}/${files.length})…`,
     });
-    const items = await ingestOne(file, role, (p) =>
-      onProgress?.({
-        fileName: file.name,
-        index: i + 1,
-        total: files.length,
-        percent: Math.round(((i + p.percent / 100) / files.length) * 100),
-        status: `${file.name}: ${p.status}`,
-      }),
+    const items = await ingestOne(
+      file,
+      role,
+      (p) =>
+        onProgress?.({
+          fileName: file.name,
+          index: i + 1,
+          total: files.length,
+          percent: Math.round(((i + p.percent / 100) / files.length) * 100),
+          status: `${file.name}: ${p.status}`,
+        }),
+      year,
     );
     out.push(...items);
   }
