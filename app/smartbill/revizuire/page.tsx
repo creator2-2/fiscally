@@ -74,6 +74,36 @@ export default function ReviewD212Page() {
             onChange={(e) => patch({ identity: { ...draft.identity, cui: e.target.value } })}
           />
         </Field>
+        <Field label="CNP">
+          <TextInput
+            value={draft.identity.cnp}
+            onChange={(e) => patch({ identity: { ...draft.identity, cnp: e.target.value } })}
+          />
+        </Field>
+        <LabeledMoney
+          label="Chirii PF (brut)"
+          source={draft.pfRentalIncome.source}
+          note={draft.pfRentalIncome.note}
+          value={draft.pfRentalIncome.value}
+          onValue={(v) =>
+            setDraft((prev) => ({
+              ...prev,
+              pfRentalIncome: { ...prev.pfRentalIncome, value: v, source: "manual" },
+            }))
+          }
+        />
+        <LabeledMoney
+          label="Alte venituri PF"
+          source={draft.pfOtherIncome.source}
+          note={draft.pfOtherIncome.note}
+          value={draft.pfOtherIncome.value}
+          onValue={(v) =>
+            setDraft((prev) => ({
+              ...prev,
+              pfOtherIncome: { ...prev.pfOtherIncome, value: v, source: "manual" },
+            }))
+          }
+        />
         <LabeledMoney
           label="Venituri brute (activitate independentă)"
           source={draft.income.source}
@@ -145,6 +175,12 @@ export default function ReviewD212Page() {
         >
           Salvează în Fiscally
         </button>
+        <Link
+          href="/pregateste-du"
+          className="rounded-full border border-line px-4 py-2.5 text-sm font-semibold"
+        >
+          Pregătește Declarația unică
+        </Link>
         <Link
           href="/documente/declaratie-unica"
           className="rounded-full border border-line px-4 py-2.5 text-sm font-semibold"

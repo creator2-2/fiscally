@@ -1,4 +1,5 @@
-import type { D212Draft } from "./d212-model";
+import { emptyD212, type D212Draft } from "./d212-model";
+import { mergeDuFlow, type DuFlowState } from "./du-flow";
 import { clearDeviceKey, decryptAtRest, encryptAtRest } from "./smartbill/crypto";
 import type { ImportSummary, SmartBillCredentials } from "./smartbill/types";
 import { defaultProfile, type Profile, type Subscription } from "./types";
@@ -10,6 +11,7 @@ export const STORAGE_KEYS = {
   smartbill: "fiscally.smartbill.creds.v1",
   d212: "fiscally.d212.v1",
   import: "fiscally.import.v1",
+  duFlow: "fiscally.duFlow.v1",
 } as const;
 
 function isBrowser(): boolean {
@@ -62,7 +64,18 @@ export function loadD212(): D212Draft | null {
   if (!isBrowser()) return null;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEYS.d212);
-    return raw ? (JSON.parse(raw) as D212Draft) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<D212Draft>;
+    const base = emptyD212(defaultProfile);
+    return {
+      ...base,
+      ...parsed,
+      identity: { ...base.identity, ...parsed.identity },
+      income: parsed.income ?? base.income,
+      expenses: parsed.expenses ?? base.expenses,
+      pfRentalIncome: parsed.pfRentalIncome ?? base.pfRentalIncome,
+      pfOtherIncome: parsed.pfOtherIncome ?? base.pfOtherIncome,
+    } as D212Draft;
   } catch {
     return null;
   }
@@ -94,6 +107,21 @@ export function saveImportSummary(summary: ImportSummary | null): void {
     return;
   }
   window.localStorage.setItem(STORAGE_KEYS.import, JSON.stringify(summary));
+}
+
+export function loadDuFlow(): DuFlowState {
+  if (!isBrowser()) return mergeDuFlow(null);
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.duFlow);
+    return mergeDuFlow(raw ? (JSON.parse(raw) as Partial<DuFlowState>) : null);
+  } catch {
+    return mergeDuFlow(null);
+  }
+}
+
+export function saveDuFlow(flow: DuFlowState): void {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(STORAGE_KEYS.duFlow, JSON.stringify(flow));
 }
 
 export async function loadSmartbillCreds(): Promise<SmartBillCredentials | null> {

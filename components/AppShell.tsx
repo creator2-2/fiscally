@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BrandMark } from "./BrandMark";
+import { PrepareDuButton } from "./PrepareDuButton";
 
 const NAV = [
   { href: "/acasa", label: "Acasă", icon: HomeIcon },
-  { href: "/estimari", label: "Estimări", icon: ChartIcon },
+  { href: "/pregateste-du", label: "Pregătește DU", icon: ChartIcon, primary: true },
   { href: "/documente", label: "Documente", icon: DocsIcon },
   { href: "/termene", label: "Termene", icon: CalendarIcon },
   { href: "/cont", label: "Cont", icon: UserIcon },
@@ -28,7 +29,7 @@ export function AppShell({
       <header className="no-print sticky top-0 z-30 border-b border-line/80 bg-paper/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
           <BrandMark size="sm" href="/acasa" />
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-1 lg:flex">
             {NAV.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
@@ -36,7 +37,11 @@ export function AppShell({
                   key={item.href}
                   href={item.href}
                   className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-                    active ? "bg-mint text-sage-deep" : "text-ink-soft hover:bg-white hover:text-ink"
+                    item.primary && !active
+                      ? "bg-sage text-white hover:bg-sage-deep"
+                      : active
+                        ? "bg-mint text-sage-deep"
+                        : "text-ink-soft hover:bg-white hover:text-ink"
                   }`}
                 >
                   {item.label}
@@ -44,6 +49,11 @@ export function AppShell({
               );
             })}
           </nav>
+          {pathname.startsWith("/pregateste-du") ? null : (
+            <div className="hidden md:block lg:hidden">
+              <PrepareDuButton size="sm" />
+            </div>
+          )}
         </div>
       </header>
 

@@ -37,12 +37,20 @@ export default function DocumentDetailPage() {
     <AppShell title={meta.title} action={<ExportBar id={id} />}>
       <p className="mb-5 text-sm text-ink-soft">{meta.subtitle}</p>
       {id === "declaratie-unica" ? (
-        <Link
-          href="/smartbill"
-          className="mb-5 inline-flex rounded-full bg-mint px-4 py-2 text-sm font-semibold text-sage-deep"
-        >
-          Importă din SmartBill
-        </Link>
+        <div className="mb-5 flex flex-wrap gap-2">
+          <Link
+            href="/pregateste-du"
+            className="inline-flex rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white"
+          >
+            Pregătește Declarația unică
+          </Link>
+          <Link
+            href="/smartbill"
+            className="inline-flex rounded-full bg-mint px-4 py-2 text-sm font-semibold text-sage-deep"
+          >
+            Importă din SmartBill
+          </Link>
+        </div>
       ) : null}
 
       {id === "factura-draft" || id === "contract-servicii" ? (

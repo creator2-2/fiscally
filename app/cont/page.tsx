@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { PrepareDuButton } from "@/components/PrepareDuButton";
 import { PRICE_LEI } from "@/lib/types";
 import { formatDateRo } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -12,7 +13,7 @@ export default function ContPage() {
   const { openUpgrade } = useUpgrade();
 
   return (
-    <AppShell title="Cont">
+    <AppShell title="Cont" action={<PrepareDuButton size="sm" />}>
       <section className="rounded-3xl border border-line bg-white p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sage">Plan</p>
         <h2 className="mt-1 font-display text-3xl text-ink">
@@ -51,9 +52,14 @@ export default function ContPage() {
             ? `${profile.fullName || "Fără nume"} · ${profile.cui || "fără CUI"} · ${profile.county}`
             : "Asistentul nu este finalizat."}
         </p>
-        <Link href="/wizard" className="mt-3 inline-flex text-sm font-semibold text-sage-deep">
-          {wizardComplete ? "Editează în asistent →" : "Completează asistentul →"}
-        </Link>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Link href="/pregateste-du" className="inline-flex text-sm font-semibold text-sage-deep">
+            Pregătește Declarația unică →
+          </Link>
+          <Link href="/wizard" className="inline-flex text-sm font-semibold text-sage-deep">
+            {wizardComplete ? "Editează profilul vechi →" : "Asistent profil PFA →"}
+          </Link>
+        </div>
       </section>
 
       <section className="mt-4 rounded-3xl border border-line bg-white p-5">
@@ -62,9 +68,14 @@ export default function ContPage() {
           Importă facturile ca venituri în Declarația unică. Tokenul stă criptat doar pe acest
           dispozitiv.
         </p>
-        <Link href="/smartbill" className="mt-3 inline-flex text-sm font-semibold text-sage-deep">
-          Importă din SmartBill →
-        </Link>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Link href="/pregateste-du" className="text-sm font-semibold text-sage-deep">
+            Pregătește Declarația unică →
+          </Link>
+          <Link href="/smartbill" className="text-sm font-semibold text-sage-deep">
+            Doar SmartBill →
+          </Link>
+        </div>
       </section>
 
       <section className="mt-4 rounded-3xl border border-line bg-white p-5">

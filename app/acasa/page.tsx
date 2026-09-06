@@ -3,31 +3,37 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
+import { PrepareDuButton } from "@/components/PrepareDuButton";
 import { buildDeadlines, daysUntilLabel, nextActionableDeadline } from "@/lib/deadlines";
 import { formatRon } from "@/lib/format";
-import { useEstimate, useStore } from "@/lib/store";
+import { useCombinedEstimate, useStore } from "@/lib/store";
 
 export default function HomePage() {
   const { profile, wizardComplete, subscribed } = useStore();
-  const estimate = useEstimate();
+  const combined = useCombinedEstimate();
   const deadlines = buildDeadlines(profile);
   const next = nextActionableDeadline(deadlines);
 
   return (
-    <AppShell title="Ce ai de făcut">
+    <AppShell title="Ce ai de făcut" action={<PrepareDuButton size="sm" />}>
+      <section className="mb-6 rounded-3xl border border-sage/30 bg-mint-soft p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sage">Job principal</p>
+        <h2 className="mt-1 font-display text-3xl text-ink">Pregătește Declarația unică</h2>
+        <p className="mt-2 text-sm text-ink-soft">
+          Persoană fizică, PFA sau ambele. Aduni dovezile, calculezi, revizuiești, deschizi dosarul.
+          Nu depunem la ANAF.
+        </p>
+        <PrepareDuButton className="mt-4" />
+      </section>
+
       {!wizardComplete ? (
-        <div className="mb-6 rounded-3xl border border-line bg-white p-5">
-          <h2 className="font-display text-2xl text-ink">Începe cu profilul PFA</h2>
-          <p className="mt-2 text-sm text-ink-soft">
-            Patru pași, apoi îți arătăm termenele și documentele potrivite.
-          </p>
-          <Link
-            href="/wizard"
-            className="mt-4 inline-flex rounded-full bg-sage px-4 py-2.5 text-sm font-semibold text-white"
-          >
-            Deschide asistentul
+        <p className="mb-6 text-sm text-ink-soft">
+          Dacă vrei doar profilul vechi de PFA, rămâne{" "}
+          <Link href="/wizard" className="font-semibold text-sage-deep">
+            asistentul
           </Link>
-        </div>
+          .
+        </p>
       ) : (
         <p className="mb-6 text-ink-soft">
           Bună{profile.fullName ? `, ${profile.fullName.split(" ")[0]}` : ""}. Iată următorul
@@ -58,7 +64,7 @@ export default function HomePage() {
       <section className="mb-6 grid gap-3 sm:grid-cols-3">
         <Mini
           label="Estimare anuală"
-          value={formatRon(estimate.totalSocialAndTax)}
+          value={formatRon(combined?.totalDue ?? 0)}
           href="/estimari"
           cta="Vezi defalcarea"
         />
@@ -74,11 +80,11 @@ export default function HomePage() {
       <section className="rounded-3xl border border-line bg-white p-5">
         <h2 className="font-display text-2xl text-ink">Acțiuni rapide</h2>
         <ul className="mt-3 space-y-2 text-sm">
-          <Action href="/smartbill" label="Importă din SmartBill" />
-          <Action href="/documente/situatie-fiscala" label="Pregătește situația fiscală" />
-          <Action href="/documente/declaratie-unica" label="Checklist Declarația unică (preview gratuit)" />
-          <Action href="/documente/pachet-contabil" label="Pachet lunar pentru contabil" />
-          <Action href="/wizard" label="Actualizează veniturile" />
+          <Action href="/pregateste-du" label="Pregătește Declarația unică" />
+          <Action href="/documente/declaratie-unica" label="Deschide pachetul D212" />
+          <Action href="/estimari" label="Vezi estimările" />
+          <Action href="/documente" label="Documente secundare" />
+          <Action href="/wizard" label="Asistentul vechi de profil" />
         </ul>
       </section>
 

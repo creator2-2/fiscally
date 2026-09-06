@@ -18,7 +18,7 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   title: "Fiscally — Pregătește. Exportă. Depune.",
   description:
-    "Documentele fiscale pentru PFA din servicii și IT. Estimări orientative, pachete pentru contabil și exporturi PDF. Nu depune la ANAF.",
+    "Pregătește Declarația unică (D212) pentru persoană fizică și/sau PFA. Dovezi, calcul orientativ, dosar. Nu depune la ANAF.",
 };
 
 export default function RootLayout({

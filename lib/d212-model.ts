@@ -1,3 +1,4 @@
+import type { DuFlowState, FilerRole } from "./du-flow";
 import { computeEstimate } from "./tax-engine";
 import type { ImportSummary } from "./smartbill/types";
 import type { CasBaseChoice, Profile, TaxEstimate } from "./types";
@@ -14,12 +15,14 @@ export interface D212Identity {
   fullName: string;
   tradeName: string;
   cui: string;
+  cnp: string;
   county: string;
   city: string;
   address: string;
   email: string;
   activity: Profile["activity"];
   caen: string;
+  filerRole: FilerRole | null;
 }
 
 export interface D212Draft {
@@ -27,6 +30,8 @@ export interface D212Draft {
   identity: D212Identity;
   income: SourcedField;
   expenses: SourcedField;
+  pfRentalIncome: SourcedField;
+  pfOtherIncome: SourcedField;
   tvaPayer: boolean;
   tvaCollected: SourcedField;
   tvaDeductible: SourcedField;
@@ -44,12 +49,14 @@ export function emptyD212(profile: Profile, year = profile.fiscalYear): D212Draf
       fullName: profile.fullName,
       tradeName: profile.tradeName,
       cui: profile.cui,
+      cnp: profile.cnp,
       county: profile.county,
       city: profile.city,
       address: profile.address,
       email: profile.email,
       activity: profile.activity,
       caen: profile.caen,
+      filerRole: profile.filerRole,
     },
     income: {
       value: profile.income,
@@ -60,6 +67,16 @@ export function emptyD212(profile: Profile, year = profile.fiscalYear): D212Draf
       value: profile.expenses,
       source: "wizard",
       note: "SmartBill nu exportă cheltuielile PFA. Păstrăm valoarea din asistent.",
+    },
+    pfRentalIncome: {
+      value: profile.pfRentalIncome,
+      source: "manual",
+      note: "Venituri din chirii (PF) — ipoteză 20% forfetar",
+    },
+    pfOtherIncome: {
+      value: profile.pfOtherIncome,
+      source: "manual",
+      note: "Alte venituri PF",
     },
     tvaPayer: profile.tvaPayer,
     tvaCollected: {
@@ -126,6 +143,8 @@ export function draftToProfile(profile: Profile, draft: D212Draft): Profile {
     fullName: draft.identity.fullName || profile.fullName,
     tradeName: draft.identity.tradeName,
     cui: draft.identity.cui || profile.cui,
+    cnp: draft.identity.cnp || profile.cnp,
+    filerRole: draft.identity.filerRole,
     county: draft.identity.county,
     city: draft.identity.city,
     address: draft.identity.address,
@@ -135,12 +154,54 @@ export function draftToProfile(profile: Profile, draft: D212Draft): Profile {
     fiscalYear: draft.year,
     income: draft.income.value,
     expenses: draft.expenses.value,
+    pfRentalIncome: draft.pfRentalIncome.value,
+    pfOtherIncome: draft.pfOtherIncome.value,
     tvaPayer: draft.tvaPayer,
     tvaCollected: draft.tvaCollected.value,
     tvaDeductible: draft.tvaDeductible.value,
     alsoEmployee: draft.alsoEmployee,
     casOptional: draft.casOptional,
     casBaseChoice: draft.casBaseChoice,
+  };
+}
+
+export function flowToD212(profile: Profile, flow: DuFlowState, previous?: D212Draft | null): D212Draft {
+  const base = previous ?? emptyD212(profile, flow.year);
+  const imported = flow.evidence.some((e) => e.kind === "csv" || e.kind === "smartbill");
+  return {
+    ...base,
+    year: flow.year,
+    identity: {
+      ...base.identity,
+      fullName: flow.fullName || base.identity.fullName,
+      cui: flow.cui || base.identity.cui,
+      cnp: flow.cnp || base.identity.cnp,
+      email: flow.email || base.identity.email,
+      activity: flow.pfaActivity,
+      filerRole: flow.role,
+    },
+    income: {
+      value: flow.pfaIncome,
+      source: imported ? "imported" : flow.pfaIncome ? "manual" : "wizard",
+      note: imported ? "Din dovezile importate în Pregătește DU" : "Din fluxul Pregătește DU",
+    },
+    expenses: {
+      ...base.expenses,
+      value: flow.pfaExpenses,
+    },
+    pfRentalIncome: {
+      ...base.pfRentalIncome,
+      value: flow.pfRentalIncome,
+      source: flow.pfRentalIncome ? "manual" : base.pfRentalIncome.source,
+    },
+    pfOtherIncome: {
+      ...base.pfOtherIncome,
+      value: flow.pfOtherIncome,
+      source: flow.pfOtherIncome ? "manual" : base.pfOtherIncome.source,
+    },
+    alsoEmployee: flow.alsoEmployee,
+    casOptional: flow.casOptional,
+    casBaseChoice: flow.casBaseChoice,
   };
 }
 

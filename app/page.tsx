@@ -14,27 +14,27 @@ export default function LandingPage() {
 
       <main className="mx-auto max-w-5xl px-4 pb-20 pt-6 md:pt-14">
         <p className="inline-flex rounded-full bg-mint px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sage-deep">
-          Pentru PFA din servicii, IT și profesii liberale
+          Persoană fizică și PFA · Declarația unică
         </p>
         <h1 className="mt-5 max-w-3xl font-display text-5xl leading-[1.05] tracking-tight text-ink md:text-7xl">
-          Pregătește. Exportă. Depune.
+          Pregătește Declarația unică.
         </h1>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
-          Fiscally este fabrica de documente fiscale — nu un program de e-Factura.
-          Îți pregătești hârtiile, le dai contabilului, depui tu în SPV.
+          Aduni dovezile de venit, calculezi orientativ CAS / CASS / impozit și ieși cu un dosar
+          D212. Tu depui în SPV. Contractele și proformele rămân secundare.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/wizard"
+            href="/pregateste-du"
             className="rounded-full bg-sage px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sage/25 hover:bg-sage-deep"
           >
-            Începe gratis
+            Pregătește Declarația unică
           </Link>
           <Link
             href="/acasa"
             className="rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink hover:bg-paper"
           >
-            Am deja profil
+            Am deja dosar
           </Link>
         </div>
 
@@ -42,11 +42,11 @@ export default function LandingPage() {
           {[
             {
               t: "Pregătește",
-              d: "Asistent scurt: profil PFA, venituri, cheltuieli, TVA. Estimare pe ecran, imediat.",
+              d: "Cine depune, anul, dovezi (CSV / SmartBill), calcul automat, revizuire D212.",
             },
             {
               t: "Exportă",
-              d: "Situație fiscală, pachet D212, dosar pentru contabil, contract și proformă.",
+              d: "Pachet Declarația unică, situație fiscală, dosar pentru contabil. Restul e secundar.",
             },
             {
               t: "Depune",
@@ -65,10 +65,10 @@ export default function LandingPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mint">Gratuit</p>
             <h2 className="mt-2 font-display text-3xl">0 lei</h2>
             <ul className="mt-4 space-y-2 text-sm text-white/80">
-              <li>Asistent de profil</li>
+              <li>Flux Pregătește DU (PF și/sau PFA)</li>
               <li>Estimare fiscală pe ecran</li>
-              <li>Lista de termene</li>
-              <li>Un preview de checklist (Declarația unică)</li>
+              <li>Import CSV / SmartBill</li>
+              <li>Preview checklist Declarația unică</li>
             </ul>
           </article>
           <article className="rounded-3xl border border-line bg-white px-6 py-7">
@@ -81,10 +81,10 @@ export default function LandingPage() {
               <li>Dosar e-Factura / SPV</li>
             </ul>
             <Link
-              href="/wizard"
+              href="/pregateste-du"
               className="mt-6 inline-flex rounded-full bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage-deep"
             >
-              Începe gratis
+              Pregătește Declarația unică
             </Link>
           </article>
         </section>
