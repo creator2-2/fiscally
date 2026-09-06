@@ -74,6 +74,7 @@ export default function HomePage() {
       <section className="rounded-3xl border border-line bg-white p-5">
         <h2 className="font-display text-2xl text-ink">Acțiuni rapide</h2>
         <ul className="mt-3 space-y-2 text-sm">
+          <Action href="/smartbill" label="Importă din SmartBill" />
           <Action href="/documente/situatie-fiscala" label="Pregătește situația fiscală" />
           <Action href="/documente/declaratie-unica" label="Checklist Declarația unică (preview gratuit)" />
           <Action href="/documente/pachet-contabil" label="Pachet lunar pentru contabil" />

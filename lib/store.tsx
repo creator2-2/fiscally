@@ -9,12 +9,20 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { draftToProfile, type D212Draft } from "./d212-model";
+import type { ImportSummary, SmartBillCredentials } from "./smartbill/types";
 import {
   clearAllFiscallyData,
+  loadD212,
+  loadImportSummary,
   loadProfile,
+  loadSmartbillCreds,
   loadSubscription,
   loadWizardComplete,
+  saveD212,
+  saveImportSummary,
   saveProfile,
+  saveSmartbillCreds,
   saveSubscription,
   saveWizardComplete,
 } from "./storage";
@@ -27,9 +35,16 @@ interface Store {
   subscription: Subscription;
   wizardComplete: boolean;
   subscribed: boolean;
+  smartbill: SmartBillCredentials | null;
+  d212: D212Draft | null;
+  importSummary: ImportSummary | null;
   updateProfile: (patch: Partial<Profile>) => void;
   replaceProfile: (profile: Profile) => void;
   setWizardComplete: (done: boolean) => void;
+  setSmartbill: (creds: SmartBillCredentials | null) => Promise<void>;
+  setD212: (draft: D212Draft | null) => void;
+  setImportSummary: (summary: ImportSummary | null) => void;
+  applyD212: (draft: D212Draft) => void;
   upgrade: () => void;
   downgrade: () => void;
   reset: () => void;
@@ -45,12 +60,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     upgradedAt: null,
   });
   const [wizardComplete, setWizardCompleteState] = useState(false);
+  const [smartbill, setSmartbillState] = useState<SmartBillCredentials | null>(null);
+  const [d212, setD212State] = useState<D212Draft | null>(null);
+  const [importSummary, setImportSummaryState] = useState<ImportSummary | null>(null);
 
   useEffect(() => {
     setProfile(loadProfile());
     setSubscription(loadSubscription());
     setWizardCompleteState(loadWizardComplete());
-    setReady(true);
+    setD212State(loadD212());
+    setImportSummaryState(loadImportSummary());
+    void loadSmartbillCreds()
+      .then(setSmartbillState)
+      .finally(() => setReady(true));
   }, []);
 
   const updateProfile = useCallback((patch: Partial<Profile>) => {
@@ -86,11 +108,44 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     saveSubscription(next);
   }, []);
 
+  const setSmartbill = useCallback(async (creds: SmartBillCredentials | null) => {
+    setSmartbillState(creds);
+    await saveSmartbillCreds(creds);
+  }, []);
+
+  const setD212 = useCallback((draft: D212Draft | null) => {
+    setD212State(draft);
+    saveD212(draft);
+  }, []);
+
+  const setImportSummary = useCallback((summary: ImportSummary | null) => {
+    setImportSummaryState(summary);
+    saveImportSummary(summary);
+  }, []);
+
+  const applyD212 = useCallback((draft: D212Draft) => {
+    const saved: D212Draft = { ...draft, savedAt: new Date().toISOString() };
+    setD212State(saved);
+    saveD212(saved);
+    if (draft.importSummary) {
+      setImportSummaryState(draft.importSummary);
+      saveImportSummary(draft.importSummary);
+    }
+    setProfile((prev) => {
+      const next = draftToProfile(prev, saved);
+      saveProfile(next);
+      return next;
+    });
+  }, []);
+
   const reset = useCallback(() => {
     clearAllFiscallyData();
     setProfile({ ...defaultProfile });
     setSubscription({ plan: "free", upgradedAt: null });
     setWizardCompleteState(false);
+    setSmartbillState(null);
+    setD212State(null);
+    setImportSummaryState(null);
   }, []);
 
   const value = useMemo<Store>(
@@ -100,9 +155,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       subscription,
       wizardComplete,
       subscribed: subscription.plan === "paid",
+      smartbill,
+      d212,
+      importSummary,
       updateProfile,
       replaceProfile,
       setWizardComplete,
+      setSmartbill,
+      setD212,
+      setImportSummary,
+      applyD212,
       upgrade,
       downgrade,
       reset,
@@ -112,9 +174,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       profile,
       subscription,
       wizardComplete,
+      smartbill,
+      d212,
+      importSummary,
       updateProfile,
       replaceProfile,
       setWizardComplete,
+      setSmartbill,
+      setD212,
+      setImportSummary,
+      applyD212,
       upgrade,
       downgrade,
       reset,

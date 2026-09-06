@@ -12,7 +12,7 @@ import { useStore } from "@/lib/store";
 export default function PrintPage() {
   const params = useParams<{ id: string }>();
   const search = useSearchParams();
-  const { profile, subscribed, ready } = useStore();
+  const { profile, subscribed, ready, d212 } = useStore();
   const estimate = useMemo(() => computeEstimate(profile), [profile]);
   const meta = getDocument(params.id);
   const id = meta?.id as DocumentId | undefined;
@@ -53,7 +53,7 @@ export default function PrintPage() {
           Printează / salvează PDF
         </button>
       </div>
-      <DocumentView id={id} profile={profile} estimate={estimate} />
+      <DocumentView id={id} profile={profile} estimate={estimate} d212={d212} />
     </div>
   );
 }
