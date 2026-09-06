@@ -1,0 +1,11 @@
+# Netlify build settings for Fiscally (Next.js App Router).
+# OpenNext adapter is applied automatically by Netlify for Next.js 13.5+;
+# do not pin @netlify/plugin-nextjs unless intentionally opting out of updates.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--no-audit --no-fund"
