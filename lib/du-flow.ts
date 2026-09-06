@@ -4,7 +4,7 @@ import type { ActivityType, CasBaseChoice } from "./types";
 export type { OcrClassification };
 export type FilerRole = "pf" | "pfa" | "ambele";
 export type DuStep = 1 | 2 | 3 | 4 | 5 | 6;
-export type EvidenceKind = "csv" | "smartbill" | "manual" | "pdf" | "ocr";
+export type EvidenceKind = "csv" | "smartbill" | "manual" | "pdf" | "ocr" | "xlsx" | "txt" | "json";
 
 export interface EvidenceOcr {
   amount: number;

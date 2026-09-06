@@ -4,7 +4,7 @@
 
 **North star:** pregătești **Declarația unică (D212)** pentru **persoană fizică și/sau PFA**, adunând dovezi de venit și calculând orientativ. Restul (contract, proformă, e-Factura) e secundar.
 
-Flux principal: **[Pregătește Declarația unică](/pregateste-du)** — cine depune → an → dovezi (CSV / SmartBill / OCR chitanțe) → calcul → revizuire → dosar. Nu depunem la ANAF.
+Flux principal: **[Pregătește Declarația unică](/pregateste-du)** — cine depune → an → dovezi (încarcă orice) → calcul → revizuire → dosar. Nu depunem la ANAF.
 
 Complementar cu SmartBill — **nu** este un program de e-Factura și **nu** depune nimic la ANAF.
 
@@ -16,7 +16,7 @@ Ruta `/pregateste-du`. CTA-ul principal de pe Landing și Acasă.
 
 1. Cine depune: PF / PFA (servicii, IT, liberal) / Ambele
 2. An fiscal + CUI / CNP
-3. Inbox dovezi: CSV, SmartBill (Faza 2), **OCR chitanțe** (poze / PDF), sume PF manuale. Banca rămâne **în curând**.
+3. Inbox dovezi **Încarcă orice**: poze, PDF, CSV, Excel, JSON, text + linie manuală, apoi confirmare în lot. SmartBill rămâne opțional. Banca e **în curând**.
 4. Calcul automat: PFA sistem real (motor existent) + PF chirii / alte venituri (ipoteze 2026, etichetate)
 5. Revizuire editabilă
 6. Dosar gata → pachet Declarația unică + checklist SPV
@@ -25,18 +25,32 @@ Starea fluxului stă în `localStorage` (`fiscally.duFlow.v1`). Exportul PDF ră
 
 ---
 
-## OCR chitanțe
+## Inbox universal (Încarcă orice)
 
-În pasul **Dovezi** (`/pregateste-du`): încarci o poză (jpg/png/webp) sau un PDF. Recunoașterea rulează **în browser** cu [Tesseract.js](https://tesseract.projectnaptha.com/) (eng). PDF-urile cu strat de text sunt citite local cu PDF.js; scanările merg tot prin Tesseract.
+În pasul **Dovezi** poți trage mai multe fișiere odată. Totul se parsează **pe dispozitiv**.
 
-- Nu trimitem chitanța la un API plătit. Motorul (wasm + traineddata) se descarcă din CDN la prima utilizare.
-- Heuristici RO: sume (`32,50 lei`, `1.234,56`), date `dd.mm.yyyy`, linie comerciant.
-- Confirmi / editezi totul. Clasificare: cheltuială PFA, venit PF sau altele (doar inbox).
-- Confirmarea **adaugă** suma în calcul (nu înlocuiește CSV-ul). Ștergerea o scade.
-- OCR **greșește**. Nu pretindem acuratețe 100%. Verifică înainte de SPV.
-- Exemplu sintetic, fără date personale: `public/examples/chitanta-demo.png` (TOTAL **32,50 LEI**, 12.03.2026).
+| Format | Ce se întâmplă |
+| --- | --- |
+| jpg / png / webp | OCR Tesseract (local) |
+| PDF | text PDF.js și/sau OCR prima pagină |
+| CSV | parser facturi existent sau tabel generic |
+| xlsx / xls | foaia 1 → rânduri; mapare coloane dacă antetul e neclar |
+| JSON / txt | sume + date simple sau un TOTAL de factură |
+| Linie manuală | sumă, dată, descriere, tip — fără fișier |
 
-Depunerea la ANAF **nu** este inclusă.
+Clasificare la confirmare: **venit PFA / cheltuială PFA / venit PF / ignoră**. Confirmarea **adaugă** în calcul. Ștergerea scade.
+
+Exemple sintetice (fără date personale):
+
+- `public/examples/smartbill-facturi-2026.csv`
+- `public/examples/chitanta-demo.png`
+- `public/examples/dovezi-2026.xlsx`
+- `public/examples/factura-demo.pdf`
+- `public/examples/dovezi-demo.json`
+
+**Nu este inclus:** Open Banking / extras bancar (rămâne „în curând”), depunere ANAF/SPV.
+
+OCR **poate greși**. Verifică înainte de SPV.
 
 ---
 
