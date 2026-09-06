@@ -1,0 +1,5 @@
+Synthetic demo receipt (no personal data).
+Expected OCR / parse:
+- merchant: Magazin Demo Fiscally
+- date: 12.03.2026
+- total: 32,50 LEI
