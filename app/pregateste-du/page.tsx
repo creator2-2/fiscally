@@ -478,7 +478,9 @@ export default function PregatesteDuPage() {
                 >
                   <span>
                     <strong>{item.label}</strong>
-                    {item.total != null ? ` · ${formatRon(item.total)}` : ""}
+                    {item.total != null
+                      ? ` · ${formatRon(item.total, item.kind === "ocr")}`
+                      : ""}
                     <span className="block text-xs text-ink-soft">{item.note || item.kind}</span>
                   </span>
                   <button
