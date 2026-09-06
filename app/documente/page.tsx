@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { PrepareDuButton } from "@/components/PrepareDuButton";
 import { useUpgrade } from "@/components/UpgradeModal";
 import { DOCUMENTS } from "@/lib/documents";
 import { useStore } from "@/lib/store";
@@ -11,17 +12,20 @@ export default function DocumentsPage() {
   const { openUpgrade } = useUpgrade();
 
   return (
-    <AppShell title="Documente">
+    <AppShell title="Documente" action={<PrepareDuButton size="sm" />}>
       <p className="mb-4 max-w-2xl text-ink-soft">
-        Un preview gratuit: checklist-ul Declarației unice. Restul pachetelor se deschid după
-        upgrade. Exportul PDF este mereu pe paywall, până activezi planul.
+        Jobul principal este Declarația unică. Celelalte pachete (contract, proformă, e-Factura) sunt
+        secundare. Exportul PDF rămâne pe paywall.
       </p>
-      <Link
-        href="/smartbill"
-        className="mb-6 inline-flex rounded-full bg-mint px-4 py-2 text-sm font-semibold text-sage-deep"
-      >
-        Importă din SmartBill
-      </Link>
+      <div className="mb-6 flex flex-wrap gap-2">
+        <PrepareDuButton size="sm" />
+        <Link
+          href="/smartbill"
+          className="inline-flex rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink"
+        >
+          Importă din SmartBill
+        </Link>
+      </div>
       <div className="grid gap-3 md:grid-cols-2">
         {DOCUMENTS.map((doc) => {
           const locked = !subscribed && !doc.freePreview;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BrandMark } from "@/components/BrandMark";
 import { Disclaimer } from "@/components/Disclaimer";
@@ -64,7 +65,11 @@ export default function WizardPage() {
 
         <h1 className="font-display text-4xl text-ink">{STEPS[step]}</h1>
         <p className="mt-2 text-sm text-ink-soft">
-          Datele rămân pe dispozitivul tău. Le poți schimba oricând din Cont.
+          Asistent vechi de profil PFA. Pentru Declarația unică, folosește{" "}
+          <Link href="/pregateste-du" className="font-semibold text-sage-deep">
+            Pregătește Declarația unică
+          </Link>
+          . Datele rămân pe dispozitiv.
         </p>
 
         <div className="mt-6 space-y-4">

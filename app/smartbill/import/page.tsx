@@ -11,11 +11,12 @@ import { importSmartBillInvoices } from "@/lib/smartbill/client";
 import { aggregateImport } from "@/lib/smartbill/normalize";
 import type { ImportedInvoice, ImportSummary } from "@/lib/smartbill/types";
 import { formatRon } from "@/lib/format";
+import { applyImportToFlow } from "@/lib/du-flow";
 import { useStore } from "@/lib/store";
 
 export default function ImportPage() {
   const router = useRouter();
-  const { profile, smartbill, d212, setImportSummary, setD212 } = useStore();
+  const { profile, smartbill, d212, setImportSummary, setD212, duFlow, setDuFlow } = useStore();
   const [year, setYear] = useState(profile.fiscalYear || 2026);
   const [busy, setBusy] = useState<"api" | "csv" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +27,16 @@ export default function ImportPage() {
     setSummary(next);
     setImportSummary(next);
     setD212(mapImportToD212(profile, next, d212));
+    setDuFlow(
+      applyImportToFlow(duFlow, {
+        kind: next.source === "csv" ? "csv" : "smartbill",
+        label: next.source === "csv" ? `CSV ${next.year}` : `SmartBill ${next.year}`,
+        year: next.year,
+        invoiceCount: next.includedCount,
+        total: next.totalIncome,
+        note: next.note,
+      }),
+    );
   }
 
   async function importFromApi() {
@@ -202,10 +213,10 @@ export default function ImportPage() {
           </ul>
           <button
             type="button"
-            onClick={() => router.push("/smartbill/revizuire")}
+            onClick={() => router.push("/pregateste-du")}
             className="mt-5 rounded-full bg-sage px-4 py-2.5 text-sm font-semibold text-white"
           >
-            Revizuiește înainte de D212
+            Continuă în Pregătește DU
           </button>
         </section>
       ) : (

@@ -1,5 +1,6 @@
 import type { D212Draft } from "@/lib/d212-model";
 import { sourceLabel } from "@/lib/d212-model";
+import { ROLE_LABELS } from "@/lib/du-flow";
 import { formatDateRo, formatRon, formatShortDate, displayName, todayIso } from "@/lib/format";
 import { derivedThresholds, TAX_CONFIG_2026 } from "@/lib/tax-config";
 import type { DocumentId, Profile, TaxEstimate } from "@/lib/types";
@@ -162,9 +163,20 @@ function DeclaratieUnica({
       <section>
         <h3 className="font-display text-xl text-ink">Date de precompletat</h3>
         <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+          <Pair
+            label="Cine depune"
+            value={
+              d212?.identity.filerRole
+                ? ROLE_LABELS[d212.identity.filerRole]
+                : profile.filerRole
+                  ? ROLE_LABELS[profile.filerRole]
+                  : "PFA (implicit)"
+            }
+          />
           <Pair label="Nume" value={profile.fullName || "—"} />
           <Pair label="Denumire PFA" value={profile.tradeName || "—"} />
           <Pair label="CUI" value={profile.cui || "—"} />
+          <Pair label="CNP" value={d212?.identity.cnp || profile.cnp || "—"} />
           <Pair label="Email" value={profile.email || "—"} />
           <Pair label="Telefon" value={profile.phone || "—"} />
           <Pair label="Județ / localitate" value={`${profile.county}${profile.city ? `, ${profile.city}` : ""}`} />
@@ -180,6 +192,22 @@ function DeclaratieUnica({
           <Pair label="CAS estimat" value={`${formatRon(estimate.cas)} · estimat`} />
           <Pair label="CASS estimat" value={`${formatRon(estimate.cass)} · estimat`} />
           <Pair label="Impozit estimat" value={`${formatRon(estimate.incomeTax)} · estimat`} />
+          {d212 &&
+          (d212.identity.filerRole === "pf" ||
+            d212.identity.filerRole === "ambele" ||
+            d212.pfRentalIncome.value > 0 ||
+            d212.pfOtherIncome.value > 0) ? (
+            <>
+              <Pair
+                label="Chirii PF"
+                value={`${formatRon(d212.pfRentalIncome.value)} · ${sourceLabel(d212.pfRentalIncome.source)}`}
+              />
+              <Pair
+                label="Alte venituri PF"
+                value={`${formatRon(d212.pfOtherIncome.value)} · ${sourceLabel(d212.pfOtherIncome.source)}`}
+              />
+            </>
+          ) : null}
         </dl>
       </section>
 

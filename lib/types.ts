@@ -1,3 +1,5 @@
+import type { FilerRole } from "./du-flow";
+
 export type ActivityType = "servicii" | "it" | "liberal";
 export type CasBaseChoice = "12" | "24";
 export type InvoiceKind = "factura" | "proforma";
@@ -7,6 +9,8 @@ export interface Profile {
   fullName: string;
   tradeName: string;
   cui: string;
+  cnp: string;
+  filerRole: FilerRole | null;
   email: string;
   phone: string;
   county: string;
@@ -18,6 +22,9 @@ export interface Profile {
   fiscalYear: number;
   income: number;
   expenses: number;
+  pfRentalIncome: number;
+  pfOtherIncome: number;
+  pfOtherExpenses: number;
   tvaPayer: boolean;
   tvaCollected: number;
   tvaDeductible: number;
@@ -163,6 +170,8 @@ export const defaultProfile: Profile = {
   fullName: "",
   tradeName: "",
   cui: "",
+  cnp: "",
+  filerRole: null,
   email: "",
   phone: "",
   county: "București",
@@ -174,6 +183,9 @@ export const defaultProfile: Profile = {
   fiscalYear: 2026,
   income: 0,
   expenses: 0,
+  pfRentalIncome: 0,
+  pfOtherIncome: 0,
+  pfOtherExpenses: 0,
   tvaPayer: false,
   tvaCollected: 0,
   tvaDeductible: 0,

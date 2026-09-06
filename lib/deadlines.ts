@@ -38,7 +38,7 @@ export function buildDeadlines(profile: Profile, today = new Date()): Deadline[]
       date: iso(2026, 5, 25),
       category: "declaratie",
       status: statusFor(iso(2026, 5, 25), today),
-      href: "/documente/declaratie-unica",
+      href: "/pregateste-du",
     },
     {
       id: "du-2026",
@@ -48,7 +48,7 @@ export function buildDeadlines(profile: Profile, today = new Date()): Deadline[]
       date: iso(2027, 5, 25),
       category: "declaratie",
       status: statusFor(iso(2027, 5, 25), today),
-      href: "/documente/declaratie-unica",
+      href: "/pregateste-du",
     },
     {
       id: "plata-2026",

@@ -2,9 +2,26 @@
 
 **Pregătește. Exportă. Depune.**
 
-Instrument web pentru PFA din România (servicii, IT, profesii liberale): asistent de profil, estimare fiscală orientativă și fabrică de documente pe care le poți folosi sau preda contabilului.
+**North star:** pregătești **Declarația unică (D212)** pentru **persoană fizică și/sau PFA**, adunând dovezi de venit și calculând orientativ. Restul (contract, proformă, e-Factura) e secundar.
+
+Flux principal: **[Pregătește Declarația unică](/pregateste-du)** — cine depune → an → dovezi (CSV / SmartBill) → calcul → revizuire → dosar. Nu depunem la ANAF.
 
 Complementar cu SmartBill — **nu** este un program de e-Factura și **nu** depune nimic la ANAF.
+
+---
+
+## Pregătește DU (flux unificat)
+
+Ruta `/pregateste-du`. CTA-ul principal de pe Landing și Acasă.
+
+1. Cine depune: PF / PFA (servicii, IT, liberal) / Ambele
+2. An fiscal + CUI / CNP
+3. Inbox dovezi: CSV, SmartBill (Faza 2), PDF ca dovadă (fără extract), sume PF manuale. OCR și banca sunt **în curând**.
+4. Calcul automat: PFA sistem real (motor existent) + PF chirii / alte venituri (ipoteze 2026, etichetate)
+5. Revizuire editabilă
+6. Dosar gata → pachet Declarația unică + checklist SPV
+
+Starea fluxului stă în `localStorage` (`fiscally.duFlow.v1`). Exportul PDF rămâne pe paywall.
 
 ---
 
@@ -73,7 +90,7 @@ Datele rămân în browser (`localStorage`).
 
 ## What this is (EN)
 
-A Romanian-language document factory for sole traders (PFA). Fill a short wizard, see an on-screen tax sketch, export packs for yourself or your accountant. Subscription is a local mock flag. No live ANAF submission, no real payments.
+A Romanian-language guide to prepare **Declarația unică (D212)** for individuals and/or PFA: gather income evidence, estimate tax, review, open a dossier. Secondary packs (contract, proforma) stay available. Subscription is a local mock flag. No live ANAF submission, no real payments.
 
 ---
 
@@ -98,6 +115,12 @@ Configurația din `lib/tax-config.ts` (referință 1 ianuarie 2026):
 - Impozit pe venit: 10% pe (venit net − CAS − CASS)
 - CAS 25% dacă venitul net ≥ 12 salarii minime; bază 12 sau 24 salarii
 - CASS 10% pe venitul net, cu bază minimă 6 salarii (dacă nu ești și salariat) și plafon 72 salarii
+
+Persoană fizică (altul decât PFA), etichetat orientativ în `lib/pf-tax.ts`:
+
+- Chirii: cheltuială forfetară 20%, impozit 10% pe 80% din brut
+- Alte venituri: impozit 10% pe (brut − cheltuieli)
+- CASS 10% pe netul PF, aceleași plafoane 6–72 SM; **fără CAS** pe aceste fluxuri
 
 Verifică întotdeauna cu un contabil. Reguli reale se pot schimba.
 

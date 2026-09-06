@@ -2,19 +2,19 @@ import type { DocumentId, DocumentMeta } from "./types";
 
 export const DOCUMENTS: DocumentMeta[] = [
   {
+    id: "declaratie-unica",
+    title: "Declarația unică",
+    subtitle: "Checklist ghidat + date precompletate. Nu este XML oficial. Pregătește-o din fluxul principal.",
+    pack: "Pachet D212",
+    freePreview: true,
+    priority: 1,
+  },
+  {
     id: "situatie-fiscala",
     title: "Situație fiscală",
     subtitle: "Estimare anuală de impozit, CAS și CASS — gata de printat.",
     pack: "PDF fiscal",
     freePreview: false,
-    priority: 1,
-  },
-  {
-    id: "declaratie-unica",
-    title: "Declarația unică",
-    subtitle: "Checklist ghidat + date precompletate. Nu este XML oficial.",
-    pack: "Pachet D212",
-    freePreview: true,
     priority: 2,
   },
   {
