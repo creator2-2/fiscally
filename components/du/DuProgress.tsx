@@ -11,7 +11,8 @@ export function DuProgress({ step, onJump }: { step: DuStep; onJump?: (s: DuStep
             <button
               type="button"
               onClick={() => onJump?.(item.id)}
-              className="w-full text-left"
+              aria-current={active ? "step" : undefined}
+              className="w-full rounded-lg text-left focus-visible:ring-4 focus-visible:ring-mint"
             >
               <span
                 className={`block h-1.5 rounded-full ${

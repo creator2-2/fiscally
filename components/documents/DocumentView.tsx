@@ -1,3 +1,4 @@
+import { anafFormForIncomeYear } from "@/lib/anaf/registry";
 import type { D212Draft } from "@/lib/d212-model";
 import { sourceLabel } from "@/lib/d212-model";
 import { ROLE_LABELS } from "@/lib/du-flow";
@@ -133,13 +134,15 @@ function DeclaratieUnica({
   estimate: TaxEstimate;
   d212?: D212Draft | null;
 }) {
+  const form = anafFormForIncomeYear(estimate.year);
+  const web = form.artifacts.find((a) => a.id === "web-duf");
   const steps = [
     "Intră în SPV (Spațiul Privat Virtual) cu certificatul digital sau credențialele ANAF.",
-    "Deschide Declarația unică (D212) pentru anul de venit. Nu folosi acest pachet ca fișier oficial.",
+    "Deschide Declarația unică (D212) pentru anul de venit din formularul web oficial. Nu folosi acest pachet ca fișier oficial.",
     "Completează datele de identificare cu valorile din tabelul de mai jos.",
     "Completează capitolul de venituri din activități independente — sistem real.",
     "Verifică bazele de CAS și CASS. Ajustează dacă ai și salariu sau alte venituri.",
-    "Salvează, semnează și depune în SPV. Plătește obligațiile până la termenul afișat de ANAF.",
+    "Salvează, semnează și depune în SPV. Plătește obligațiile până la termenul afișat de ANAF. Fiscally nu transmite nimic.",
   ];
 
   const checks = [
@@ -157,8 +160,18 @@ function DeclaratieUnica({
     <Sheet kicker="Pachet ghidat — nu este XML oficial" title="Declarația unică (D212)">
       <p>
         Acest pachet îți preumple datele și îți arată ce să verifici.{" "}
-        <strong>Nu generează fișierul oficial ANAF</strong> și nu îl poate depune Fiscally.
+        <strong>Nu generează fișierul oficial ANAF</strong> și nu îl poate depune Fiscally. Ediție
+        de referință: {form.order}
+        {form.status === "provisional" ? " (șablon, până apare ordinul pentru anul tău)" : ""}.
       </p>
+      {web ? (
+        <p>
+          Formular web oficial:{" "}
+          <a href={web.href} className="font-semibold text-sage-deep underline" target="_blank" rel="noreferrer">
+            {web.href}
+          </a>
+        </p>
+      ) : null}
 
       <section>
         <h3 className="font-display text-xl text-ink">Date de precompletat</h3>

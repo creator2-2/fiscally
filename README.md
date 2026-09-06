@@ -19,7 +19,7 @@ Ruta `/pregateste-du`. CTA-ul principal de pe Landing și Acasă.
 3. Inbox dovezi **Încarcă orice**: poze, PDF, CSV, Excel, JSON, text + linie manuală, apoi confirmare în lot. SmartBill rămâne opțional. Banca e **în curând**.
 4. Calcul automat: PFA sistem real (motor existent) + PF chirii / alte venituri (ipoteze 2026, etichetate)
 5. Revizuire editabilă
-6. Dosar gata → pachet Declarația unică + checklist SPV
+6. Dosar gata → cadru ANAF (link oficial + JSON/PDF precompletat) + checklist SPV
 
 Starea fluxului stă în `localStorage` (`fiscally.duFlow.v1`). Exportul PDF rămâne pe paywall.
 
@@ -48,9 +48,27 @@ Exemple sintetice (fără date personale):
 - `public/examples/factura-demo.pdf`
 - `public/examples/dovezi-demo.json`
 
-**Nu este inclus:** Open Banking / extras bancar (rămâne „în curând”), depunere ANAF/SPV.
+**Nu este inclus:** Open Banking / extras bancar (rămâne „în curând”), depunere automată ANAF/SPV.
 
 OCR **poate greși**. Verifică înainte de SPV.
+
+---
+
+## Cadru ANAF (precompletare, fără depunere)
+
+Dosarul din Pregătește DU pregătește materialele oficiale, **nu le trimite**.
+
+1. **Registru de formulare** (`lib/anaf/registry.ts`) — D212 / Declarația unică pe anul de venit: link web ANAF, PDF oficial, anexa, broșură, index, SPV. Data ultimei verificări e în fișier. Pentru venituri 2026, ediția e **provizorie** până apare ordinul de la începutul lui 2027; folosim OpANAF 2736/2025 ca șablon.
+2. **Mapare de câmpuri** (`lib/anaf/mapping.ts`) — modelul intern D212 → chei stabile (`ident.cnp`, `cap1.ai.venit_brut`, …). La un an nou actualizezi registry + note, nu tot UI-ul. Formularul curent e web, nu un PDF AcroForm de încredere; nu redistribuim binare ANAF.
+3. **Pachet de precompletare** — JSON (`fiscally.anaf.prefill.v1`) + PDF fișă Fiscally (clar etichetat: nu e D212 oficial) + checklist uman.
+4. **SPV asistat** — pași în română. Fără login automat, fără robot, fără mesaj „depus”.
+
+Linkuri de start (verifică pe anaf.ro):
+
+- Formular web: https://www.anaf.ro/declaratii/duf
+- Index: https://static.anaf.ro/static/10/Anaf/Declaratii_R/declaratie_unica.html
+
+**Tu confirmi și depui.** Estimările Fiscally pot diferi de calculele ANAF.
 
 ---
 
@@ -125,8 +143,9 @@ A Romanian-language guide to prepare **Declarația unică (D212)** for individua
 
 ## În afara scopului / Out of scope
 
-- Depunere live în SPV / ANAF (inclusiv după import SmartBill)
+- Depunere live în SPV / ANAF (inclusiv după import SmartBill) — doar link + precompletare
 - Generare XML Declarație unică sau e-Factura
+- Redistribuire a PDF-ului oficial ANAF (doar deep-link)
 - Listare nativă a tuturor facturilor prin API V1 (limitare SmartBill — folosim CSV)
 - Stocare server-side a tokenurilor SmartBill
 - Plăți reale (Netopia, Stripe)

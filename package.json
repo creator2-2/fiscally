@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "test": "npx tsx --test lib/tax-engine.test.ts lib/d212-model.test.ts lib/smartbill/csv.test.ts lib/smartbill/errors.test.ts lib/pf-tax.test.ts lib/combined-tax.test.ts lib/du-flow.test.ts lib/ocr/parse.test.ts lib/ocr/apply.test.ts lib/ocr/apply-candidates.test.ts lib/inbox/tabular.test.ts"
+    "test": "npx tsx --test lib/tax-engine.test.ts lib/d212-model.test.ts lib/smartbill/csv.test.ts lib/smartbill/errors.test.ts lib/pf-tax.test.ts lib/combined-tax.test.ts lib/du-flow.test.ts lib/ocr/parse.test.ts lib/ocr/apply.test.ts lib/ocr/apply-candidates.test.ts lib/inbox/tabular.test.ts lib/anaf/prefill.test.ts"
   },
   "dependencies": {
     "next": "15.5.24",

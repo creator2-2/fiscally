@@ -4,7 +4,8 @@ export const DOCUMENTS: DocumentMeta[] = [
   {
     id: "declaratie-unica",
     title: "Declarația unică",
-    subtitle: "Checklist ghidat + date precompletate. Nu este XML oficial. Pregătește-o din fluxul principal.",
+    subtitle:
+      "Checklist, date precompletate și link oficial ANAF. Nu este XML și nu depune. Pregătește-o din fluxul principal.",
     pack: "Pachet D212",
     freePreview: true,
     priority: 1,

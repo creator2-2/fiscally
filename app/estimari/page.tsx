@@ -5,6 +5,8 @@ import { PrepareDuButton } from "@/components/PrepareDuButton";
 import { Disclaimer } from "@/components/Disclaimer";
 import { EstimateBreakdown } from "@/components/EstimateBreakdown";
 import { ExportBar } from "@/components/ExportBar";
+import { ButtonLink } from "@/components/ui/Button";
+import { Card, EmptyState } from "@/components/ui/Card";
 import { formatRon } from "@/lib/format";
 import { TAX_CONFIG_2026 } from "@/lib/tax-config";
 import { includesPf, includesPfa, ROLE_LABELS } from "@/lib/du-flow";
@@ -51,29 +53,28 @@ export default function EstimariPage() {
 
       {combined ? (
         <div className="mb-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-3xl border border-line bg-white px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-ink-soft">Cine depune</p>
-            <p className="mt-1 font-display text-2xl text-ink">{ROLE_LABELS[combined.role]}</p>
-          </div>
-          <div className="rounded-3xl border border-line bg-white px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-ink-soft">Venituri adunate</p>
-            <p className="mt-1 font-display text-2xl text-ink">{formatRon(combined.totalIncome)}</p>
-          </div>
-          <div className="rounded-3xl border border-sage/30 bg-mint-soft px-4 py-3">
-            <p className="text-xs uppercase tracking-wide text-ink-soft">CAS + CASS + impozit</p>
-            <p className="mt-1 font-display text-2xl text-ink">{formatRon(combined.totalDue)}</p>
-          </div>
+          <Card className="px-4 py-3.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">Cine depune</p>
+            <p className="mt-1 font-display text-2xl tracking-tight text-ink">{ROLE_LABELS[combined.role]}</p>
+          </Card>
+          <Card className="px-4 py-3.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">Venituri adunate</p>
+            <p className="mt-1 font-display text-2xl tracking-tight text-ink">{formatRon(combined.totalIncome)}</p>
+          </Card>
+          <Card tone="mint" className="px-4 py-3.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">CAS + CASS + impozit</p>
+            <p className="mt-1 font-display text-2xl tracking-tight text-ink">{formatRon(combined.totalDue)}</p>
+          </Card>
         </div>
       ) : null}
 
       {!wizardComplete ? (
-        <div className="mb-6 rounded-3xl border border-line bg-white p-5">
-          <p className="text-sm text-ink-soft">
-            Completează Pregătește DU ca estimarea să aibă sens.
-          </p>
-          <Link href="/pregateste-du" className="mt-3 inline-flex text-sm font-semibold text-sage-deep">
-            Pregătește Declarația unică →
-          </Link>
+        <div className="mb-6">
+          <EmptyState
+            title="Estimarea e încă goală"
+            text="Completează Pregătește Declarația unică ca sumele să aibă sens."
+            action={<ButtonLink href="/pregateste-du">Pregătește Declarația unică</ButtonLink>}
+          />
         </div>
       ) : null}
 

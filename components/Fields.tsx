@@ -21,7 +21,7 @@ export function Field({
 }
 
 const control =
-  "w-full rounded-2xl border border-line bg-white px-3.5 py-2.5 text-ink outline-none transition focus:border-sage focus:ring-4 focus:ring-mint";
+  "w-full rounded-2xl border border-line bg-white px-3.5 py-2.5 text-ink outline-none transition duration-200 focus:border-sage focus-visible:border-sage focus-visible:ring-4 focus-visible:ring-mint";
 
 export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${control} ${props.className ?? ""}`} />;
@@ -69,7 +69,8 @@ export function Toggle({
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="flex w-full items-start gap-3 rounded-2xl border border-line bg-white px-3.5 py-3 text-left"
+      aria-pressed={checked}
+      className="flex w-full items-start gap-3 rounded-2xl border border-line bg-white px-3.5 py-3 text-left focus-visible:ring-4 focus-visible:ring-mint"
     >
       <span
         className={`mt-0.5 inline-flex h-6 w-10 shrink-0 items-center rounded-full p-0.5 transition ${

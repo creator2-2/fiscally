@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { PrepareDuButton } from "@/components/PrepareDuButton";
 import { useUpgrade } from "@/components/UpgradeModal";
+import { Button, ButtonLink } from "@/components/ui/Button";
+import { Card, Kicker } from "@/components/ui/Card";
 import { DOCUMENTS } from "@/lib/documents";
 import { useStore } from "@/lib/store";
 
@@ -13,26 +14,23 @@ export default function DocumentsPage() {
 
   return (
     <AppShell title="Documente" action={<PrepareDuButton size="sm" />}>
-      <p className="mb-4 max-w-2xl text-ink-soft">
+      <p className="mb-5 max-w-2xl text-sm leading-relaxed text-ink-soft">
         Jobul principal este Declarația unică. Celelalte pachete (contract, proformă, e-Factura) sunt
         secundare. Exportul PDF rămâne pe paywall.
       </p>
       <div className="mb-6 flex flex-wrap gap-2">
         <PrepareDuButton size="sm" />
-        <Link
-          href="/smartbill"
-          className="inline-flex rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink"
-        >
+        <ButtonLink href="/smartbill" variant="secondary" size="sm">
           Importă din SmartBill
-        </Link>
+        </ButtonLink>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         {DOCUMENTS.map((doc) => {
           const locked = !subscribed && !doc.freePreview;
           return (
-            <article key={doc.id} className="flex flex-col rounded-3xl border border-line bg-white p-5">
+            <Card key={doc.id} className="flex flex-col">
               <div className="flex items-start justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sage">{doc.pack}</p>
+                <Kicker>{doc.pack}</Kicker>
                 {doc.freePreview && !subscribed ? (
                   <span className="rounded-full bg-mint px-2 py-0.5 text-[11px] font-semibold text-sage-deep">
                     Preview gratuit
@@ -48,31 +46,21 @@ export default function DocumentsPage() {
               <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{doc.subtitle}</p>
               <div className="mt-4 flex gap-2">
                 {locked ? (
-                  <button
-                    type="button"
+                  <Button
                     onClick={() =>
                       openUpgrade(`„${doc.title}” este inclus în planul Fiscally, 39 lei/lună.`)
                     }
-                    className="rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white"
                   >
                     Deblochează
-                  </button>
+                  </Button>
                 ) : (
-                  <Link
-                    href={`/documente/${doc.id}`}
-                    className="rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white"
-                  >
-                    Deschide
-                  </Link>
+                  <ButtonLink href={`/documente/${doc.id}`}>Deschide</ButtonLink>
                 )}
-                <Link
-                  href={`/documente/${doc.id}`}
-                  className="rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink"
-                >
+                <ButtonLink href={`/documente/${doc.id}`} variant="secondary">
                   Detalii
-                </Link>
+                </ButtonLink>
               </div>
-            </article>
+            </Card>
           );
         })}
       </div>

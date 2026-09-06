@@ -8,6 +8,7 @@ import { DocumentView } from "@/components/documents/DocumentView";
 import { ExportBar } from "@/components/ExportBar";
 import { Field, MoneyInput, SelectInput, TextInput } from "@/components/Fields";
 import { useUpgrade } from "@/components/UpgradeModal";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { canPreviewDocument, getDocument } from "@/lib/documents";
 import { computeEstimate } from "@/lib/tax-engine";
 import type { DocumentId, InvoiceKind } from "@/lib/types";
@@ -38,18 +39,12 @@ export default function DocumentDetailPage() {
       <p className="mb-5 text-sm text-ink-soft">{meta.subtitle}</p>
       {id === "declaratie-unica" ? (
         <div className="mb-5 flex flex-wrap gap-2">
-          <Link
-            href="/pregateste-du"
-            className="inline-flex rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white"
-          >
+          <ButtonLink href="/pregateste-du" size="sm">
             Pregătește Declarația unică
-          </Link>
-          <Link
-            href="/smartbill"
-            className="inline-flex rounded-full bg-mint px-4 py-2 text-sm font-semibold text-sage-deep"
-          >
+          </ButtonLink>
+          <ButtonLink href="/smartbill" variant="secondary" size="sm">
             Importă din SmartBill
-          </Link>
+          </ButtonLink>
         </div>
       ) : null}
 
@@ -135,13 +130,9 @@ export default function DocumentDetailPage() {
               <p className="mt-2 text-sm text-ink-soft">
                 Preview-ul complet și exportul sunt în planul de 39 lei/lună.
               </p>
-              <button
-                type="button"
-                onClick={() => openUpgrade()}
-                className="mt-4 rounded-full bg-sage px-4 py-2.5 text-sm font-semibold text-white"
-              >
+              <Button className="mt-4" onClick={() => openUpgrade()}>
                 Activează planul
-              </button>
+              </Button>
             </div>
           </div>
         </div>
