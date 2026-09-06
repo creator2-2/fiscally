@@ -7,16 +7,16 @@ describe("tax engine 2026", () => {
   it("computes a mid-range IT PFA without optional extras", () => {
     const estimate = computeEstimate({
       ...defaultProfile,
-      income: 180000,
-      expenses: 24000,
+      income: 80000,
+      expenses: 10000,
       alsoEmployee: false,
       casBaseChoice: "12",
     });
-    assert.equal(estimate.netBeforeContributions, 156000);
+    assert.equal(estimate.netBeforeContributions, 70000);
     assert.equal(estimate.cas, 12150);
-    assert.equal(estimate.cass, 15600);
-    assert.equal(estimate.incomeTax, 12825);
-    assert.equal(estimate.totalSocialAndTax, 40575);
+    assert.equal(estimate.cass, 7000);
+    assert.equal(estimate.incomeTax, 5085);
+    assert.equal(estimate.totalSocialAndTax, 24235);
   });
 
   it("caps CAS at 24 minimum wages", () => {
@@ -29,13 +29,15 @@ describe("tax engine 2026", () => {
     assert.ok(estimate.cass <= 29160);
   });
 
-  it("skips mandatory CAS under the 12-wage threshold", () => {
+  it("skips mandatory CAS under the 12-wage threshold and applies the CASS floor", () => {
     const estimate = computeEstimate({
       ...defaultProfile,
-      income: 40000,
-      expenses: 5000,
+      income: 20000,
+      expenses: 2000,
       casOptional: false,
+      alsoEmployee: false,
     });
+    assert.equal(estimate.netBeforeContributions, 18000);
     assert.equal(estimate.cas, 0);
     assert.equal(estimate.cass, 2430);
   });
