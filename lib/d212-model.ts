@@ -182,8 +182,17 @@ export function flowToD212(profile: Profile, flow: DuFlowState, previous?: D212D
     },
     income: {
       value: flow.pfaIncome,
-      source: imported ? "imported" : flow.pfaIncome ? "manual" : "wizard",
-      note: imported ? "Din dovezile importate în Pregătește DU" : "Din fluxul Pregătește DU",
+      source:
+        imported || flow.evidence.some((e) => e.classification === "pfa-income")
+          ? "imported"
+          : flow.pfaIncome
+            ? "manual"
+            : "wizard",
+      note: imported
+        ? "Din dovezile importate în Pregătește DU"
+        : flow.evidence.some((e) => e.classification === "pfa-income")
+          ? "Din liniile confirmate în inbox"
+          : "Din fluxul Pregătește DU",
     },
     expenses: {
       ...base.expenses,

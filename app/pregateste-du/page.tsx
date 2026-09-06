@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { DuProgress } from "@/components/du/DuProgress";
-import { OcrInbox } from "@/components/du/OcrInbox";
+import { UniversalInbox } from "@/components/du/UniversalInbox";
 import { EstimateBreakdown } from "@/components/EstimateBreakdown";
 import { Field, MoneyInput, SelectInput, TextInput, Toggle } from "@/components/Fields";
 import { SourceBadge } from "@/components/smartbill/SourceBadge";
@@ -23,7 +23,6 @@ import {
 } from "@/lib/du-flow";
 import { removeEvidenceFromFlow } from "@/lib/ocr/apply";
 import { formatRon } from "@/lib/format";
-import { parseInvoiceCsv } from "@/lib/smartbill/csv";
 import { connectSmartBill, importSmartBillInvoices } from "@/lib/smartbill/client";
 import { aggregateImport } from "@/lib/smartbill/normalize";
 import type { ImportedInvoice } from "@/lib/smartbill/types";
@@ -78,65 +77,6 @@ export default function PregatesteDuPage() {
       addedAt: new Date().toISOString(),
     };
     patchDuFlow({ evidence: [...duFlow.evidence, next] });
-  }
-
-  async function handleCsv(file: File | null) {
-    if (!file) return;
-    setBusy("csv");
-    setMessage(null);
-    try {
-      const text = await file.text();
-      const invoices = parseInvoiceCsv(text);
-      const summary = aggregateImport(invoices, duFlow.year, "csv", "Import CSV în inbox-ul DU");
-      setImportSummary(summary);
-      patchDuFlow(
-        applyImportToFlow(duFlow, {
-          kind: "csv",
-          label: file.name,
-          year: summary.year,
-          invoiceCount: summary.includedCount,
-          total: summary.totalIncome,
-          note: `${summary.includedCount} documente · ${summary.skippedCount} ignorate`,
-        }),
-      );
-      const asPf = includesPf(duFlow.role) && !includesPfa(duFlow.role);
-      setMessage({
-        ok: true,
-        text: asPf
-          ? `CSV: ${formatRon(summary.totalIncome)} notat la alte venituri PF.`
-          : `CSV: ${summary.includedCount} documente, ${formatRon(summary.totalIncome)}.`,
-      });
-    } catch (e) {
-      setMessage({ ok: false, text: e instanceof Error ? e.message : "CSV invalid." });
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  async function loadExample() {
-    setBusy("csv");
-    try {
-      const res = await fetch("/examples/smartbill-facturi-2026.csv");
-      const text = await res.text();
-      const invoices = parseInvoiceCsv(text);
-      const summary = aggregateImport(invoices, duFlow.year, "csv", "Exemplu de test");
-      setImportSummary(summary);
-      patchDuFlow(
-        applyImportToFlow(duFlow, {
-          kind: "csv",
-          label: "Exemplu SmartBill 2026",
-          year: summary.year,
-          invoiceCount: summary.includedCount,
-          total: summary.totalIncome,
-          note: "Fișier de test Fiscally",
-        }),
-      );
-      setMessage({ ok: true, text: `Exemplu: ${formatRon(summary.totalIncome)} din ${summary.includedCount} facturi.` });
-    } catch {
-      setMessage({ ok: false, text: "Nu am putut încărca exemplul." });
-    } finally {
-      setBusy(null);
-    }
   }
 
   async function testSmartBill() {
@@ -328,83 +268,12 @@ export default function PregatesteDuPage() {
       {step === 3 ? (
         <section className="space-y-4">
           <p className="text-sm text-ink-soft">
-            Inbox de dovezi pentru {duFlow.year}. CSV și SmartBill alimentează venitul PFA. Chitanțele
-            OCR pot intra la cheltuieli PFA sau venit PF. Chirii / alte venituri le poți adăuga și
-            manual.
+            Inbox de dovezi pentru {duFlow.year}. Încarcă orice dovadă (poză, PDF, CSV, Excel, JSON,
+            text) sau adaugă o linie manual. Confirmă înainte să intre în calcul. SmartBill rămâne o
+            cale separată. Banca e în curând. Nu depunem la ANAF.
           </p>
 
-          <div className="grid gap-3 md:grid-cols-2">
-              <article className="rounded-3xl border border-line bg-white p-4">
-                <h3 className="font-display text-xl">Încarcă CSV</h3>
-                <p className="mt-1 text-sm text-ink-soft">
-                  {includesPf(duFlow.role) && !includesPfa(duFlow.role)
-                    ? "Facturi sau evidențe: le notăm la alte venituri PF."
-                    : "Facturi emise: date, total, tip — alimentează venitul PFA."}
-                </p>
-                <label className="mt-3 inline-flex cursor-pointer rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white">
-                  Alege fișier
-                  <input
-                    type="file"
-                    accept=".csv,text/csv"
-                    className="hidden"
-                    onChange={(e) => void handleCsv(e.target.files?.[0] ?? null)}
-                  />
-                </label>
-                <button
-                  type="button"
-                  disabled={busy !== null}
-                  onClick={() => void loadExample()}
-                  className="ml-2 mt-3 rounded-full border border-line px-4 py-2 text-sm font-semibold"
-                >
-                  Exemplu de test
-                </button>
-              </article>
-
-              <article className="rounded-3xl border border-line bg-white p-4">
-                <h3 className="font-display text-xl">Conectează SmartBill</h3>
-                <div className="mt-3 space-y-2">
-                  <TextInput
-                    placeholder="Email Cloud"
-                    value={sbEmail}
-                    onChange={(e) => setSbEmail(e.target.value)}
-                  />
-                  <TextInput
-                    type="password"
-                    placeholder="Token API"
-                    value={sbToken}
-                    onChange={(e) => setSbToken(e.target.value)}
-                  />
-                  <TextInput
-                    placeholder="CIF"
-                    value={sbCif}
-                    onChange={(e) => setSbCif(e.target.value)}
-                  />
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={busy !== null}
-                    onClick={() => void testSmartBill()}
-                    className="rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white"
-                  >
-                    Testează
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy !== null || !smartbill}
-                    onClick={() => void importSmartBillYear()}
-                    className="rounded-full border border-line px-4 py-2 text-sm font-semibold"
-                  >
-                    Importă {duFlow.year}
-                  </button>
-                </div>
-                <p className="mt-2 text-xs text-ink-soft">
-                  Tokenul se trimite doar prin BFF, criptat local. API V1 poate să nu listeze facturile.
-                </p>
-              </article>
-            </div>
-
-          <OcrInbox
+          <UniversalInbox
             flow={duFlow}
             role={duFlow.role}
             busy={busy !== null}
@@ -412,6 +281,52 @@ export default function PregatesteDuPage() {
             onApply={setDuFlow}
             onMessage={setMessage}
           />
+
+          <article className="rounded-3xl border border-line bg-white p-4">
+            <h3 className="font-display text-xl">Conectează SmartBill</h3>
+            <p className="mt-1 text-sm text-ink-soft">
+              Opțional, dacă vrei facturile din Cloud. Tokenul rămâne pe dispozitiv.
+            </p>
+            <div className="mt-3 space-y-2">
+              <TextInput
+                placeholder="Email Cloud"
+                value={sbEmail}
+                onChange={(e) => setSbEmail(e.target.value)}
+              />
+              <TextInput
+                type="password"
+                placeholder="Token API"
+                value={sbToken}
+                onChange={(e) => setSbToken(e.target.value)}
+              />
+              <TextInput
+                placeholder="CIF"
+                value={sbCif}
+                onChange={(e) => setSbCif(e.target.value)}
+              />
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => void testSmartBill()}
+                className="rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white"
+              >
+                Testează
+              </button>
+              <button
+                type="button"
+                disabled={busy !== null || !smartbill}
+                onClick={() => void importSmartBillYear()}
+                className="rounded-full border border-line px-4 py-2 text-sm font-semibold"
+              >
+                Importă {duFlow.year}
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-ink-soft">
+              Tokenul se trimite doar prin BFF, criptat local. API V1 poate să nu listeze facturile.
+            </p>
+          </article>
 
           {includesPf(duFlow.role) ? (
             <article className="grid gap-3 rounded-3xl border border-line bg-white p-4 sm:grid-cols-2">
@@ -479,7 +394,7 @@ export default function PregatesteDuPage() {
                   <span>
                     <strong>{item.label}</strong>
                     {item.total != null
-                      ? ` · ${formatRon(item.total, item.kind === "ocr")}`
+                      ? ` · ${formatRon(item.total, Boolean(item.classification))}`
                       : ""}
                     <span className="block text-xs text-ink-soft">{item.note || item.kind}</span>
                   </span>
@@ -495,7 +410,7 @@ export default function PregatesteDuPage() {
             </ul>
           ) : (
             <p className="text-sm text-ink-soft">
-              Inbox-ul e gol. Adaugă CSV, SmartBill, o chitanță sau sume PF.
+              Inbox-ul confirmat e gol. Încarcă fișiere sau adaugă o linie, apoi confirmă.
             </p>
           )}
         </section>

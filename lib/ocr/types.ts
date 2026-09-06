@@ -1,8 +1,10 @@
-export type OcrClassification = "pfa-expense" | "pf-income" | "other";
+export type OcrClassification = "pfa-expense" | "pfa-income" | "pf-income" | "ignore" | "other";
 
 export const OCR_CLASS_LABELS: Record<OcrClassification, string> = {
   "pfa-expense": "Cheltuială PFA",
+  "pfa-income": "Venit PFA",
   "pf-income": "Venit PF",
+  ignore: "Ignoră",
   other: "Altele (doar în inbox)",
 };
 
