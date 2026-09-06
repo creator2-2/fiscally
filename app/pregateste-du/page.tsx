@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { DuProgress } from "@/components/du/DuProgress";
+import { OcrInbox } from "@/components/du/OcrInbox";
 import { EstimateBreakdown } from "@/components/EstimateBreakdown";
 import { Field, MoneyInput, SelectInput, TextInput, Toggle } from "@/components/Fields";
 import { SourceBadge } from "@/components/smartbill/SourceBadge";
@@ -20,6 +21,7 @@ import {
   type EvidenceItem,
   type FilerRole,
 } from "@/lib/du-flow";
+import { removeEvidenceFromFlow } from "@/lib/ocr/apply";
 import { formatRon } from "@/lib/format";
 import { parseInvoiceCsv } from "@/lib/smartbill/csv";
 import { connectSmartBill, importSmartBillInvoices } from "@/lib/smartbill/client";
@@ -41,6 +43,7 @@ export default function PregatesteDuPage() {
     d212,
     setWizardComplete,
     updateProfile,
+    setDuFlow,
     ready,
   } = useStore();
   const [busy, setBusy] = useState<string | null>(null);
@@ -195,20 +198,6 @@ export default function PregatesteDuPage() {
     }
   }
 
-  function handlePdf(file: File | null) {
-    if (!file) return;
-    addEvidence({
-      kind: "pdf",
-      label: file.name,
-      year: duFlow.year,
-      note: "PDF păstrat ca dovadă. Extragerea textului vine în curând — completează sumele manual.",
-    });
-    setMessage({
-      ok: true,
-      text: `${file.name} a fost adăugat. Nu extragem încă sume din PDF.`,
-    });
-  }
-
   function finishReview() {
     const draft = flowToD212(profile, duFlow, d212 ?? emptyD212(profile, duFlow.year));
     applyD212(draft);
@@ -339,8 +328,9 @@ export default function PregatesteDuPage() {
       {step === 3 ? (
         <section className="space-y-4">
           <p className="text-sm text-ink-soft">
-            Inbox de dovezi pentru {duFlow.year}. CSV și SmartBill alimentează venitul PFA. Chirii /
-            alte venituri PF le poți adăuga manual.
+            Inbox de dovezi pentru {duFlow.year}. CSV și SmartBill alimentează venitul PFA. Chitanțele
+            OCR pot intra la cheltuieli PFA sau venit PF. Chirii / alte venituri le poți adăuga și
+            manual.
           </p>
 
           <div className="grid gap-3 md:grid-cols-2">
@@ -414,21 +404,14 @@ export default function PregatesteDuPage() {
               </article>
             </div>
 
-          <article className="rounded-3xl border border-line bg-white p-4">
-            <h3 className="font-display text-xl">PDF (dovadă)</h3>
-            <p className="mt-1 text-sm text-ink-soft">
-              Salvăm fișierul în inbox. Extragerea automată de text vine mai târziu.
-            </p>
-            <label className="mt-3 inline-flex cursor-pointer rounded-full border border-line px-4 py-2 text-sm font-semibold">
-              Adaugă PDF
-              <input
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => handlePdf(e.target.files?.[0] ?? null)}
-              />
-            </label>
-          </article>
+          <OcrInbox
+            flow={duFlow}
+            role={duFlow.role}
+            busy={busy !== null}
+            onBusy={setBusy}
+            onApply={setDuFlow}
+            onMessage={setMessage}
+          />
 
           {includesPf(duFlow.role) ? (
             <article className="grid gap-3 rounded-3xl border border-line bg-white p-4 sm:grid-cols-2">
@@ -484,10 +467,7 @@ export default function PregatesteDuPage() {
             </article>
           ) : null}
 
-          <div className="grid gap-3 md:grid-cols-2">
-            <SoonCard title="Poze chitanțe / OCR" text="Fotografii și recunoaștere text — în curând." />
-            <SoonCard title="Conexiune bancă" text="Extras automat de încasări — în curând." />
-          </div>
+          <SoonCard title="Conexiune bancă" text="Extras automat de încasări — în curând." />
 
           {duFlow.evidence.length ? (
             <ul className="space-y-2">
@@ -498,15 +478,15 @@ export default function PregatesteDuPage() {
                 >
                   <span>
                     <strong>{item.label}</strong>
-                    {item.total != null ? ` · ${formatRon(item.total)}` : ""}
+                    {item.total != null
+                      ? ` · ${formatRon(item.total, item.kind === "ocr")}`
+                      : ""}
                     <span className="block text-xs text-ink-soft">{item.note || item.kind}</span>
                   </span>
                   <button
                     type="button"
                     className="text-xs font-semibold text-ink-soft"
-                    onClick={() =>
-                      patchDuFlow({ evidence: duFlow.evidence.filter((e) => e.id !== item.id) })
-                    }
+                    onClick={() => setDuFlow(removeEvidenceFromFlow(duFlow, item.id))}
                   >
                     Șterge
                   </button>
@@ -514,7 +494,9 @@ export default function PregatesteDuPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-ink-soft">Inbox-ul e gol. Adaugă un CSV, SmartBill sau sume PF.</p>
+            <p className="text-sm text-ink-soft">
+              Inbox-ul e gol. Adaugă CSV, SmartBill, o chitanță sau sume PF.
+            </p>
           )}
         </section>
       ) : null}

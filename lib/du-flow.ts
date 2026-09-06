@@ -1,8 +1,18 @@
+import type { OcrClassification } from "./ocr/types";
 import type { ActivityType, CasBaseChoice } from "./types";
 
+export type { OcrClassification };
 export type FilerRole = "pf" | "pfa" | "ambele";
 export type DuStep = 1 | 2 | 3 | 4 | 5 | 6;
-export type EvidenceKind = "csv" | "smartbill" | "manual" | "pdf";
+export type EvidenceKind = "csv" | "smartbill" | "manual" | "pdf" | "ocr";
+
+export interface EvidenceOcr {
+  amount: number;
+  date: string | null;
+  merchant: string;
+  confidence: number;
+  rawText: string;
+}
 
 export interface EvidenceItem {
   id: string;
@@ -13,6 +23,8 @@ export interface EvidenceItem {
   invoiceCount?: number;
   total?: number;
   note?: string;
+  classification?: OcrClassification;
+  ocr?: EvidenceOcr;
 }
 
 export interface DuFlowState {

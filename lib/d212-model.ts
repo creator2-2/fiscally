@@ -188,6 +188,12 @@ export function flowToD212(profile: Profile, flow: DuFlowState, previous?: D212D
     expenses: {
       ...base.expenses,
       value: flow.pfaExpenses,
+      source: flow.evidence.some((e) => e.kind === "ocr" && e.classification === "pfa-expense")
+        ? "imported"
+        : base.expenses.source,
+      note: flow.evidence.some((e) => e.kind === "ocr" && e.classification === "pfa-expense")
+        ? "Din chitanțe confirmate (OCR) + ajustări manuale"
+        : base.expenses.note,
     },
     pfRentalIncome: {
       ...base.pfRentalIncome,
@@ -197,7 +203,11 @@ export function flowToD212(profile: Profile, flow: DuFlowState, previous?: D212D
     pfOtherIncome: {
       ...base.pfOtherIncome,
       value: flow.pfOtherIncome,
-      source: flow.pfOtherIncome ? "manual" : base.pfOtherIncome.source,
+      source: flow.evidence.some((e) => e.kind === "ocr" && e.classification === "pf-income")
+        ? "imported"
+        : flow.pfOtherIncome
+          ? "manual"
+          : base.pfOtherIncome.source,
     },
     alsoEmployee: flow.alsoEmployee,
     casOptional: flow.casOptional,
