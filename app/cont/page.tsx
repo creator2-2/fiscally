@@ -57,6 +57,17 @@ export default function ContPage() {
       </section>
 
       <section className="mt-4 rounded-3xl border border-line bg-white p-5">
+        <h2 className="font-display text-2xl text-ink">SmartBill</h2>
+        <p className="mt-2 text-sm text-ink-soft">
+          Importă facturile ca venituri în Declarația unică. Tokenul stă criptat doar pe acest
+          dispozitiv.
+        </p>
+        <Link href="/smartbill" className="mt-3 inline-flex text-sm font-semibold text-sage-deep">
+          Importă din SmartBill →
+        </Link>
+      </section>
+
+      <section className="mt-4 rounded-3xl border border-line bg-white p-5">
         <h2 className="font-display text-2xl text-ink">Date locale</h2>
         <p className="mt-2 text-sm text-ink-soft">
           Profilul și flag-ul de abonament stau în localStorage. Nimic nu pleacă către ANAF sau un

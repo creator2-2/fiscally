@@ -1,0 +1,16 @@
+date,series,number,client,clientCui,total,vat,currency,type,status
+2026-01-14,FSC,101,Nord Studio SRL,RO11111101,12000,0,RON,factura,emisa
+2026-02-09,FSC,102,Client Beta SRL,RO11111102,9500,0,RON,factura,emisa
+2026-03-18,FSC,103,Atelier Lemn SRL,RO11111103,14000,0,RON,factura,emisa
+2026-04-07,FSC,104,Client Delta,RO11111104,8000,0,RON,factura,emisa
+2026-05-21,FSC,105,Helio Labs SRL,RO11111105,16000,0,RON,factura,emisa
+2026-06-03,FSC,106,Client Zeta SRL,RO11111106,11000,0,RON,factura,emisa
+2026-06-20,FSC,106S,Client Zeta SRL,RO11111106,-2000,0,RON,storno,emisa
+2026-07-11,FSC,107,Studio Estival,RO11111107,7500,0,RON,factura,emisa
+2026-08-16,FSC,108,Client Eta SRL,RO11111108,13000,0,RON,factura,emisa
+2026-09-02,FSC,109,Marea Consult,RO11111109,10500,0,RON,factura,emisa
+2026-10-19,FSC,110,Client Iota,RO11111110,9000,0,RON,factura,emisa
+2026-11-08,FSC,111,Pădure Soft SRL,RO11111111,15500,0,RON,factura,emisa
+2026-12-12,FSC,112,Client Lambda SRL,RO11111112,12500,0,RON,factura,emisa
+2026-12-15,PRF,12,Prospect 2027,RO99999999,4000,0,RON,proforma,emisa
+2025-11-02,FSC,88,Anul trecut SRL,RO22222222,3000,0,RON,factura,emisa

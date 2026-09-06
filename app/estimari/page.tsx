@@ -9,7 +9,7 @@ import { useEstimate, useStore } from "@/lib/store";
 import Link from "next/link";
 
 export default function EstimariPage() {
-  const { wizardComplete } = useStore();
+  const { wizardComplete, d212 } = useStore();
   const estimate = useEstimate();
 
   return (
@@ -21,6 +21,24 @@ export default function EstimariPage() {
         Defalcarea de pe ecran este gratuită. PDF-ul situației fiscale se deblochează cu planul de
         39 lei/lună. Toate valorile sunt {TAX_CONFIG_2026.label.toLowerCase()}.
       </p>
+
+      {d212?.importSummary ? (
+        <p className="mb-4 rounded-2xl bg-mint-soft px-4 py-3 text-sm text-sage-deep">
+          Veniturile folosesc importul {d212.importSummary.source === "csv" ? "CSV" : "SmartBill"} (
+          {d212.importSummary.includedCount} documente, {d212.year}).{" "}
+          <Link href="/smartbill/revizuire" className="font-semibold">
+            Revizuiește D212 →
+          </Link>
+        </p>
+      ) : (
+        <p className="mb-4 text-sm text-ink-soft">
+          Poți aduce veniturile din facturi:{" "}
+          <Link href="/smartbill" className="font-semibold text-sage-deep">
+            Importă din SmartBill
+          </Link>
+          .
+        </p>
+      )}
 
       {!wizardComplete ? (
         <div className="mb-6 rounded-3xl border border-line bg-white p-5">
