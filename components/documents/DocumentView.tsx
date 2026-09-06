@@ -1,3 +1,5 @@
+import type { D212Draft } from "@/lib/d212-model";
+import { sourceLabel } from "@/lib/d212-model";
 import { formatDateRo, formatRon, formatShortDate, displayName, todayIso } from "@/lib/format";
 import { derivedThresholds, TAX_CONFIG_2026 } from "@/lib/tax-config";
 import type { DocumentId, Profile, TaxEstimate } from "@/lib/types";
@@ -7,16 +9,18 @@ export function DocumentView({
   id,
   profile,
   estimate,
+  d212,
 }: {
   id: DocumentId;
   profile: Profile;
   estimate: TaxEstimate;
+  d212?: D212Draft | null;
 }) {
   switch (id) {
     case "situatie-fiscala":
       return <SituatieFiscala profile={profile} estimate={estimate} />;
     case "declaratie-unica":
-      return <DeclaratieUnica profile={profile} estimate={estimate} />;
+      return <DeclaratieUnica profile={profile} estimate={estimate} d212={d212} />;
     case "pachet-contabil":
       return <PachetContabil profile={profile} estimate={estimate} />;
     case "dosar-efactura":
@@ -119,7 +123,15 @@ function SituatieFiscala({ profile, estimate }: { profile: Profile; estimate: Ta
   );
 }
 
-function DeclaratieUnica({ profile, estimate }: { profile: Profile; estimate: TaxEstimate }) {
+function DeclaratieUnica({
+  profile,
+  estimate,
+  d212,
+}: {
+  profile: Profile;
+  estimate: TaxEstimate;
+  d212?: D212Draft | null;
+}) {
   const steps = [
     "Intră în SPV (Spațiul Privat Virtual) cu certificatul digital sau credențialele ANAF.",
     "Deschide Declarația unică (D212) pentru anul de venit. Nu folosi acest pachet ca fișier oficial.",
@@ -156,14 +168,38 @@ function DeclaratieUnica({ profile, estimate }: { profile: Profile; estimate: Ta
           <Pair label="Email" value={profile.email || "—"} />
           <Pair label="Telefon" value={profile.phone || "—"} />
           <Pair label="Județ / localitate" value={`${profile.county}${profile.city ? `, ${profile.city}` : ""}`} />
-          <Pair label={`Venituri brute ${estimate.year}`} value={formatRon(estimate.income)} />
-          <Pair label="Cheltuieli deductibile" value={formatRon(estimate.expenses)} />
+          <Pair
+            label={`Venituri brute ${estimate.year}`}
+            value={`${formatRon(estimate.income)}${d212 ? ` · ${sourceLabel(d212.income.source)}` : ""}`}
+          />
+          <Pair
+            label="Cheltuieli deductibile"
+            value={`${formatRon(estimate.expenses)}${d212 ? ` · ${sourceLabel(d212.expenses.source)}` : ""}`}
+          />
           <Pair label="Venit net" value={formatRon(estimate.netBeforeContributions)} />
-          <Pair label="CAS estimat" value={formatRon(estimate.cas)} />
-          <Pair label="CASS estimat" value={formatRon(estimate.cass)} />
-          <Pair label="Impozit estimat" value={formatRon(estimate.incomeTax)} />
+          <Pair label="CAS estimat" value={`${formatRon(estimate.cas)} · estimat`} />
+          <Pair label="CASS estimat" value={`${formatRon(estimate.cass)} · estimat`} />
+          <Pair label="Impozit estimat" value={`${formatRon(estimate.incomeTax)} · estimat`} />
         </dl>
       </section>
+
+      {d212?.importSummary ? (
+        <section>
+          <h3 className="font-display text-xl text-ink">Proveniență venituri</h3>
+          <p>
+            {d212.importSummary.source === "csv" ? "CSV" : "SmartBill"} ·{" "}
+            {d212.importSummary.includedCount} documente · {formatRon(d212.importSummary.totalIncome)} în{" "}
+            {d212.importSummary.year}. Proformele nu sunt incluse. Verifică înainte de SPV.
+          </p>
+          <ul className="mt-2 grid gap-1 sm:grid-cols-2">
+            {d212.importSummary.months.map((m) => (
+              <li key={m.month} className="rounded-xl bg-paper px-3 py-2">
+                {m.label}: {formatRon(m.total)} ({m.count})
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section>
         <h3 className="font-display text-xl text-ink">Pași în SPV</h3>

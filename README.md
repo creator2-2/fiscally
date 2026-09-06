@@ -8,6 +8,27 @@ Complementar cu SmartBill — **nu** este un program de e-Factura și **nu** dep
 
 ---
 
+## Faza 2 — Import SmartBill → D212
+
+1. Ia tokenul din SmartBill Cloud: **Contul meu → Integrări → API** (email, token, CIF).
+2. În Fiscally: **Importă din SmartBill** (Acasă, Documente sau Cont).
+3. Testează conexiunea. Credentialele pleacă per-cerere prin route handlers (`/api/smartbill/connect`, `/api/smartbill/invoices`) — **BFF**: tokenul nu stă pe server și nu e logat.
+4. Pe dispozitiv, tokenul e păstrat **criptat (AES-GCM)** în `localStorage`, cu cheie tot locală. E mai bine decât text clar, dar nu e un seif: cine are acces la browser îl poate folosi. Avertismentul apare în UI.
+5. Importă anul fiscal. API-ul public V1 **nu listează facturile** (doar serii / taxe / documente individuale). Dacă listarea eșuează, încarcă un **CSV** (coloanele sunt documentate pe ecran) sau folosește `public/examples/smartbill-facturi-2026.csv`.
+6. **Revizuiește înainte de D212**: câmpuri importate vs. estimate vs. manuale, tot editabil. Salvezi → Estimări + pachetul Declarația unică se actualizează.
+
+Limită SmartBill: ~3 cereri/secundă (30 / 10 s). Planul Cloud fără API va eșua cu mesaj clar.
+
+### Tradeoff BFF vs. tot-în-browser
+
+Apelurile merg prin Next.js Route Handlers ca tokenul să nu fie trimis din browser **direct** către SmartBill (și ca să evităm CORS). Handlerul **nu persistă** credentialele. Alternativa „doar localStorage + fetch din client” ar expune tokenul în fiecare request cross-origin și e blocată de CORS. Nu pune tokenul în `.env` pentru acest MVP.
+
+### How to get a SmartBill token (EN)
+
+SmartBill Cloud → My account → Integrations → API. Copy email, token, company CIF. Paste into Fiscally. Never commit tokens. CSV fallback works without a live API.
+
+---
+
 ## Cum rulezi / How to run
 
 ```bash
@@ -34,6 +55,7 @@ npm run lint
 - Asistent în 4 pași: profil PFA, venituri & cheltuieli, TVA + contribuții, recapitulare
 - Acasă, Estimări, Documente, Termene, Cont
 - Motor fiscal centralizat (`lib/tax-config.ts` + `lib/tax-engine.ts`) cu ipoteze **2026**, etichetate ca aproximative
+- Faza 2: conexiune SmartBill (BFF), import an / CSV, mapare D212, ecran de revizuire
 - Hub de documente:
   1. Situație fiscală (PDF / print)
   2. Pachet ghidat Declarația unică (checklist + date precompletate, **fără XML oficial**)
@@ -57,8 +79,10 @@ A Romanian-language document factory for sole traders (PFA). Fill a short wizard
 
 ## În afara scopului / Out of scope
 
-- Depunere live în SPV / ANAF
+- Depunere live în SPV / ANAF (inclusiv după import SmartBill)
 - Generare XML Declarație unică sau e-Factura
+- Listare nativă a tuturor facturilor prin API V1 (limitare SmartBill — folosim CSV)
+- Stocare server-side a tokenurilor SmartBill
 - Plăți reale (Netopia, Stripe)
 - Contabilitate de SRL, magazine, stocuri, salariați
 - Sfat fiscal sau juridic autorizat

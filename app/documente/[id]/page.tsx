@@ -16,7 +16,7 @@ import { useStore } from "@/lib/store";
 export default function DocumentDetailPage() {
   const params = useParams<{ id: string }>();
   const meta = getDocument(params.id);
-  const { profile, updateProfile, subscribed } = useStore();
+  const { profile, updateProfile, subscribed, d212 } = useStore();
   const { openUpgrade } = useUpgrade();
   const estimate = useMemo(() => computeEstimate(profile), [profile]);
 
@@ -36,6 +36,14 @@ export default function DocumentDetailPage() {
   return (
     <AppShell title={meta.title} action={<ExportBar id={id} />}>
       <p className="mb-5 text-sm text-ink-soft">{meta.subtitle}</p>
+      {id === "declaratie-unica" ? (
+        <Link
+          href="/smartbill"
+          className="mb-5 inline-flex rounded-full bg-mint px-4 py-2 text-sm font-semibold text-sage-deep"
+        >
+          Importă din SmartBill
+        </Link>
+      ) : null}
 
       {id === "factura-draft" || id === "contract-servicii" ? (
         <section className="mb-6 grid gap-3 rounded-3xl border border-line bg-white p-4 sm:grid-cols-2">
@@ -107,11 +115,11 @@ export default function DocumentDetailPage() {
       ) : null}
 
       {canSee ? (
-        <DocumentView id={id} profile={profile} estimate={estimate} />
+        <DocumentView id={id} profile={profile} estimate={estimate} d212={d212} />
       ) : (
         <div className="relative overflow-hidden rounded-3xl border border-line">
           <div className="pointer-events-none select-none blur-[3px]">
-            <DocumentView id={id} profile={profile} estimate={estimate} />
+            <DocumentView id={id} profile={profile} estimate={estimate} d212={d212} />
           </div>
           <div className="absolute inset-0 flex items-center justify-center bg-paper/50 p-6">
             <div className="max-w-sm rounded-3xl bg-white p-5 text-center shadow-xl">

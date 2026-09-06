@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "test": "npx tsx --test lib/tax-engine.test.ts"
+    "test": "npx tsx --test lib/tax-engine.test.ts lib/d212-model.test.ts lib/smartbill/csv.test.ts lib/smartbill/errors.test.ts"
   },
   "dependencies": {
     "next": "15.5.24",

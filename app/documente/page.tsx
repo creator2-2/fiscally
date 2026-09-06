@@ -12,10 +12,16 @@ export default function DocumentsPage() {
 
   return (
     <AppShell title="Documente">
-      <p className="mb-6 max-w-2xl text-ink-soft">
+      <p className="mb-4 max-w-2xl text-ink-soft">
         Un preview gratuit: checklist-ul Declarației unice. Restul pachetelor se deschid după
         upgrade. Exportul PDF este mereu pe paywall, până activezi planul.
       </p>
+      <Link
+        href="/smartbill"
+        className="mb-6 inline-flex rounded-full bg-mint px-4 py-2 text-sm font-semibold text-sage-deep"
+      >
+        Importă din SmartBill
+      </Link>
       <div className="grid gap-3 md:grid-cols-2">
         {DOCUMENTS.map((doc) => {
           const locked = !subscribed && !doc.freePreview;
