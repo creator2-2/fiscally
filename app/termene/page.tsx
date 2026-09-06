@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { ButtonLink } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { buildDeadlines, daysUntilLabel } from "@/lib/deadlines";
 import { formatShortDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -27,7 +28,7 @@ export default function TermenePage() {
         {deadlines.map((d) => {
           const badge = STATUS[d.status];
           return (
-            <li key={d.id} className="rounded-3xl border border-line bg-white p-5">
+            <Card as="li" key={d.id}>
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${badge.className}`}>
                   {badge.label}
@@ -39,11 +40,11 @@ export default function TermenePage() {
               <h2 className="mt-2 font-display text-2xl text-ink">{d.title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">{d.description}</p>
               {d.href ? (
-                <Link href={d.href} className="mt-3 inline-flex text-sm font-semibold text-sage-deep">
+                <ButtonLink href={d.href} variant="ghost" size="sm" className="mt-3">
                   Deschide →
-                </Link>
+                </ButtonLink>
               ) : null}
-            </li>
+            </Card>
           );
         })}
       </ul>

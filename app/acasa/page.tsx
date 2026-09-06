@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { PrepareDuButton } from "@/components/PrepareDuButton";
+import { Card, Kicker } from "@/components/ui/Card";
 import { buildDeadlines, daysUntilLabel, nextActionableDeadline } from "@/lib/deadlines";
 import { formatRon } from "@/lib/format";
 import { useCombinedEstimate, useStore } from "@/lib/store";
@@ -16,15 +17,15 @@ export default function HomePage() {
 
   return (
     <AppShell title="Ce ai de făcut" action={<PrepareDuButton size="sm" />}>
-      <section className="mb-6 rounded-3xl border border-sage/30 bg-mint-soft p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sage">Job principal</p>
-        <h2 className="mt-1 font-display text-3xl text-ink">Pregătește Declarația unică</h2>
-        <p className="mt-2 text-sm text-ink-soft">
+      <Card tone="mint" className="mb-6">
+        <Kicker>Job principal</Kicker>
+        <h2 className="mt-1 font-display text-3xl tracking-tight text-ink">Pregătește Declarația unică</h2>
+        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
           Persoană fizică, PFA sau ambele. Aduni dovezile, calculezi, revizuiești, deschizi dosarul.
-          Nu depunem la ANAF.
+          Tu depui în SPV — Fiscally nu o face.
         </p>
         <PrepareDuButton className="mt-4" />
-      </section>
+      </Card>
 
       {!wizardComplete ? (
         <p className="mb-6 text-sm text-ink-soft">
@@ -77,7 +78,7 @@ export default function HomePage() {
         />
       </section>
 
-      <section className="rounded-3xl border border-line bg-white p-5">
+      <Card>
         <h2 className="font-display text-2xl text-ink">Acțiuni rapide</h2>
         <ul className="mt-3 space-y-2 text-sm">
           <Action href="/pregateste-du" label="Pregătește Declarația unică" />
@@ -86,7 +87,7 @@ export default function HomePage() {
           <Action href="/documente" label="Documente secundare" />
           <Action href="/wizard" label="Asistentul vechi de profil" />
         </ul>
-      </section>
+      </Card>
 
       <div className="mt-6">
         <Disclaimer />
@@ -107,7 +108,10 @@ function Mini({
   cta: string;
 }) {
   return (
-    <Link href={href} className="rounded-3xl border border-line bg-white p-4 hover:border-sage/40">
+    <Link
+      href={href}
+      className="rounded-3xl border border-line bg-white p-4 shadow-[0_1px_0_rgba(27,42,34,0.03)] transition hover:border-sage/40 hover:bg-mint-soft/40"
+    >
       <p className="text-xs uppercase tracking-wide text-ink-soft">{label}</p>
       <p className="mt-1 font-display text-2xl text-ink">{value}</p>
       <p className="mt-2 text-sm font-semibold text-sage-deep">{cta} →</p>

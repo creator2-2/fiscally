@@ -227,6 +227,21 @@ export function UniversalInbox({
           >
             Doar CSV exemplu
           </button>
+          <label className="inline-flex cursor-pointer rounded-full border border-sage/40 bg-mint-soft px-4 py-2 text-sm font-semibold text-sage-deep">
+            Adaugă încă
+            <input
+              type="file"
+              multiple
+              accept={ACCEPT_ATTR}
+              className="hidden"
+              disabled={busy}
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? []);
+                e.target.value = "";
+                void ingest(files);
+              }}
+            />
+          </label>
         </div>
         <p className="mt-3 text-xs text-ink-soft">
           Acceptate: jpg, png, webp, PDF, CSV, xlsx/xls, JSON, txt. Max. 8 MB / fișier.

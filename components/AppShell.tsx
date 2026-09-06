@@ -6,11 +6,11 @@ import { BrandMark } from "./BrandMark";
 import { PrepareDuButton } from "./PrepareDuButton";
 
 const NAV = [
-  { href: "/acasa", label: "Acasă", icon: HomeIcon },
-  { href: "/pregateste-du", label: "Pregătește DU", icon: ChartIcon, primary: true },
-  { href: "/documente", label: "Documente", icon: DocsIcon },
-  { href: "/termene", label: "Termene", icon: CalendarIcon },
-  { href: "/cont", label: "Cont", icon: UserIcon },
+  { href: "/acasa", label: "Acasă", short: "Acasă", icon: HomeIcon },
+  { href: "/pregateste-du", label: "Pregătește DU", short: "DU", icon: ChartIcon, primary: true },
+  { href: "/documente", label: "Documente", short: "Docs", icon: DocsIcon },
+  { href: "/termene", label: "Termene", short: "Termene", icon: CalendarIcon },
+  { href: "/cont", label: "Cont", short: "Cont", icon: UserIcon },
 ];
 
 export function AppShell({
@@ -36,13 +36,14 @@ export function AppShell({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-full px-3 py-1.5 text-sm font-medium ${
+                  className={`rounded-full px-3 py-1.5 text-sm font-medium focus-visible:ring-4 focus-visible:ring-mint ${
                     item.primary && !active
                       ? "bg-sage text-white hover:bg-sage-deep"
                       : active
                         ? "bg-mint text-sage-deep"
                         : "text-ink-soft hover:bg-white hover:text-ink"
                   }`}
+                  aria-current={active ? "page" : undefined}
                 >
                   {item.label}
                 </Link>
@@ -58,14 +59,19 @@ export function AppShell({
       </header>
 
       <main className="mx-auto max-w-5xl px-4 pb-28 pt-6 md:pb-12 md:pt-8">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <h1 className="font-display text-3xl tracking-tight text-ink md:text-4xl">{title}</h1>
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3 md:mb-7">
+          <h1 className="font-display text-[1.85rem] leading-tight tracking-tight text-ink md:text-4xl">
+            {title}
+          </h1>
           {action}
         </div>
         {children}
       </main>
 
-      <nav className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur md:hidden">
+      <nav
+        className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur md:hidden"
+        aria-label="Navigare principală"
+      >
         <ul className="grid grid-cols-5">
           {NAV.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -74,12 +80,13 @@ export function AppShell({
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`flex flex-col items-center gap-1 rounded-2xl px-1 py-1 text-[11px] font-medium ${
-                    active ? "text-sage-deep" : "text-ink-soft"
+                  aria-current={active ? "page" : undefined}
+                  className={`flex flex-col items-center gap-0.5 rounded-2xl px-1 py-1.5 text-[11px] font-medium ${
+                    active ? "bg-mint-soft text-sage-deep" : "text-ink-soft"
                   }`}
                 >
                   <Icon active={active} />
-                  {item.label}
+                  {item.short}
                 </Link>
               </li>
             );

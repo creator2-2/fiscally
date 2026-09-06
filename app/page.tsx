@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { BrandMark } from "@/components/BrandMark";
+import { ButtonLink } from "@/components/ui/Button";
+import { Card, Kicker } from "@/components/ui/Card";
 import { PRICE_LEI } from "@/lib/types";
 
 export default function LandingPage() {
@@ -20,49 +22,43 @@ export default function LandingPage() {
           Pregătește Declarația unică.
         </h1>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
-          Aduni dovezile de venit, calculezi orientativ CAS / CASS / impozit și ieși cu un dosar
-          D212. Tu depui în SPV. Contractele și proformele rămân secundare.
+          Încarci dovezile (poză, PDF, CSV, Excel), calculezi orientativ CAS / CASS / impozit și ieși
+          cu un dosar D212 gata de completat. Tu depui în SPV.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href="/pregateste-du"
-            className="rounded-full bg-sage px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sage/25 hover:bg-sage-deep"
-          >
+          <ButtonLink href="/pregateste-du" size="lg">
             Pregătește Declarația unică
-          </Link>
-          <Link
-            href="/acasa"
-            className="rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink hover:bg-paper"
-          >
+          </ButtonLink>
+          <ButtonLink href="/acasa" variant="secondary" size="lg">
             Am deja dosar
-          </Link>
+          </ButtonLink>
         </div>
 
         <section className="mt-16 grid gap-4 md:grid-cols-3">
           {[
             {
               t: "Pregătește",
-              d: "Cine depune, anul, dovezi (CSV / SmartBill), calcul automat, revizuire D212.",
+              d: "Cine depune, anul, inbox de dovezi (orice fișier + linie manuală), calcul, revizuire.",
             },
             {
               t: "Exportă",
-              d: "Pachet Declarația unică, situație fiscală, dosar pentru contabil. Restul e secundar.",
+              d: "Pachet Declarația unică, JSON/PDF precompletat, situație fiscală. Restul e secundar.",
             },
             {
               t: "Depune",
-              d: "Tu depui în SPV. Fiscally nu se conectează la ANAF și nu pretinde că o face.",
+              d: "Tu deschizi formularul ANAF și transmiți în SPV. Fiscally nu se conectează și nu pretinde că a depus.",
             },
           ].map((card) => (
-            <article key={card.t} className="rounded-3xl border border-line bg-white/80 p-5 shadow-sm">
+            <Card key={card.t} className="bg-white/85">
               <h2 className="font-display text-2xl text-ink">{card.t}</h2>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">{card.d}</p>
-            </article>
+            </Card>
           ))}
         </section>
 
         <section className="mt-16 grid gap-4 md:grid-cols-2">
           <article className="rounded-3xl bg-ink px-6 py-7 text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-mint">Gratuit</p>
+            <Kicker className="text-mint">Gratuit</Kicker>
             <h2 className="mt-2 font-display text-3xl">0 lei</h2>
             <ul className="mt-4 space-y-2 text-sm text-white/80">
               <li>Flux Pregătește DU (PF și/sau PFA)</li>
@@ -71,8 +67,8 @@ export default function LandingPage() {
               <li>Preview checklist Declarația unică</li>
             </ul>
           </article>
-          <article className="rounded-3xl border border-line bg-white px-6 py-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sage">Fiscally</p>
+          <Card className="px-6 py-7">
+            <Kicker>Fiscally</Kicker>
             <h2 className="mt-2 font-display text-3xl text-ink">{PRICE_LEI} lei / lună</h2>
             <ul className="mt-4 space-y-2 text-sm text-ink-soft">
               <li>Toate exporturile PDF</li>
@@ -80,13 +76,10 @@ export default function LandingPage() {
               <li>Contract PFA și factură / proformă</li>
               <li>Dosar e-Factura / SPV</li>
             </ul>
-            <Link
-              href="/pregateste-du"
-              className="mt-6 inline-flex rounded-full bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage-deep"
-            >
+            <ButtonLink href="/pregateste-du" className="mt-6">
               Pregătește Declarația unică
-            </Link>
-          </article>
+            </ButtonLink>
+          </Card>
         </section>
 
         <p className="mt-12 max-w-2xl text-sm leading-relaxed text-ink-soft">

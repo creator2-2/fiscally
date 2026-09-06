@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { AnafDosar } from "@/components/anaf/AnafDosar";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { DuProgress } from "@/components/du/DuProgress";
@@ -9,6 +9,8 @@ import { UniversalInbox } from "@/components/du/UniversalInbox";
 import { EstimateBreakdown } from "@/components/EstimateBreakdown";
 import { Field, MoneyInput, SelectInput, TextInput, Toggle } from "@/components/Fields";
 import { SourceBadge } from "@/components/smartbill/SourceBadge";
+import { Button, ButtonLink } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/Card";
 import { computeCombined, flowToPfaProfile, hydrateFreshFlow } from "@/lib/combined-tax";
 import { emptyD212, flowToD212 } from "@/lib/d212-model";
 import {
@@ -156,9 +158,9 @@ export default function PregatesteDuPage() {
         </span>
       }
     >
-      <p className="mb-4 max-w-2xl text-sm text-ink-soft">
-        Aduni dovezile de venit, calculezi orientativ și pregătești dosarul D212. Tu depui în SPV.
-        Fiscally nu se conectează la ANAF.
+      <p className="mb-5 max-w-2xl text-sm leading-relaxed text-ink-soft">
+        Aduni dovezile, calculezi orientativ și pregătești dosarul D212. Tu deschizi formularul ANAF
+        și depui în SPV. Fiscally nu se autentifică și nu pretinde că a depus.
       </p>
       <DuProgress step={step} onJump={(s) => go(s)} />
 
@@ -306,22 +308,16 @@ export default function PregatesteDuPage() {
               />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={busy !== null}
-                onClick={() => void testSmartBill()}
-                className="rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white"
-              >
+              <Button disabled={busy !== null} onClick={() => void testSmartBill()}>
                 Testează
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="secondary"
                 disabled={busy !== null || !smartbill}
                 onClick={() => void importSmartBillYear()}
-                className="rounded-full border border-line px-4 py-2 text-sm font-semibold"
               >
                 Importă {duFlow.year}
-              </button>
+              </Button>
             </div>
             <p className="mt-2 text-xs text-ink-soft">
               Tokenul se trimite doar prin BFF, criptat local. API V1 poate să nu listeze facturile.
@@ -409,9 +405,10 @@ export default function PregatesteDuPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-ink-soft">
-              Inbox-ul confirmat e gol. Încarcă fișiere sau adaugă o linie, apoi confirmă.
-            </p>
+            <EmptyState
+              title="Nicio dovadă confirmată"
+              text="Încarcă fișiere sau adaugă o linie, apoi confirmă. Banca rămâne în curând."
+            />
           )}
         </section>
       ) : null}
@@ -547,43 +544,16 @@ export default function PregatesteDuPage() {
               {formatRon(combined.pf.cass)}. {combined.pf.cassNote}
             </p>
           ) : null}
-          <Link href="/smartbill/revizuire" className="inline-flex text-sm font-semibold text-sage-deep">
+          <ButtonLink href="/smartbill/revizuire" variant="ghost" size="sm">
             Revizuire detaliată (Faza 2) →
-          </Link>
+          </ButtonLink>
           <Disclaimer />
         </section>
       ) : null}
 
       {step === 6 ? (
         <section className="space-y-4">
-          <div className="rounded-3xl border border-line bg-mint-soft p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sage">Dosar gata</p>
-            <h2 className="mt-1 font-display text-3xl text-ink">Poți deschide pachetul D212</h2>
-            <p className="mt-2 text-sm text-ink-soft">
-              {duFlow.fullName || "Profilul tău"} · {duFlow.year} ·{" "}
-              {duFlow.role ? ROLE_LABELS[duFlow.role] : ""} · {formatRon(combined?.totalDue ?? 0)}{" "}
-              obligații orientative. Nu este depus la ANAF.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/documente/declaratie-unica"
-              className="rounded-full bg-sage px-4 py-2.5 text-sm font-semibold text-white"
-            >
-              Deschide Declarația unică
-            </Link>
-            <Link
-              href="/estimari"
-              className="rounded-full border border-line px-4 py-2.5 text-sm font-semibold"
-            >
-              Vezi Estimări
-            </Link>
-          </div>
-          <ol className="list-decimal space-y-1 pl-5 text-sm text-ink-soft">
-            <li>Verifică cifrele cu un contabil, dacă ai nevoie.</li>
-            <li>Intră în SPV și completează D212 cu datele din pachet.</li>
-            <li>Semnează și depui tu. Fiscally nu transmite nimic.</li>
-          </ol>
+          <AnafDosar profile={profile} flow={duFlow} d212={d212} combined={combined} />
           <Disclaimer />
         </section>
       ) : null}
@@ -600,32 +570,24 @@ export default function PregatesteDuPage() {
 
       <div className="mt-8 flex gap-3">
         {step > 1 ? (
-          <button
-            type="button"
-            onClick={() => go((step - 1) as DuStep)}
-            className="rounded-full border border-line bg-white px-5 py-3 text-sm font-semibold"
-          >
+          <Button variant="secondary" size="lg" onClick={() => go((step - 1) as DuStep)}>
             Înapoi
-          </button>
+          </Button>
         ) : null}
         {step < 5 ? (
-          <button
-            type="button"
+          <Button
+            size="lg"
+            className="flex-1"
             disabled={step === 1 && !duFlow.role}
             onClick={() => go((step + 1) as DuStep)}
-            className="flex-1 rounded-full bg-sage px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
           >
             Continuă
-          </button>
+          </Button>
         ) : null}
         {step === 5 ? (
-          <button
-            type="button"
-            onClick={finishReview}
-            className="flex-1 rounded-full bg-sage px-5 py-3 text-sm font-semibold text-white"
-          >
+          <Button size="lg" className="flex-1" onClick={finishReview}>
             Salvează și deschide dosarul
-          </button>
+          </Button>
         ) : null}
       </div>
       {step === 4 && includesPfa(duFlow.role) ? (
@@ -639,9 +601,9 @@ export default function PregatesteDuPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-3xl border border-line bg-white px-4 py-3">
-      <p className="text-xs uppercase tracking-wide text-ink-soft">{label}</p>
-      <p className="mt-1 font-display text-2xl text-ink">{value}</p>
+    <div className="rounded-3xl border border-line bg-white px-4 py-3.5 shadow-[0_1px_0_rgba(27,42,34,0.03)]">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
+      <p className="mt-1 font-display text-2xl tracking-tight text-ink">{value}</p>
     </div>
   );
 }
