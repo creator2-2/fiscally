@@ -50,7 +50,7 @@ Exemple sintetice (fără date personale):
 - `public/examples/dovezi-demo.json`
 - `public/examples/extras-bt-2026.csv`
 
-Extrasul se citește pe dispozitiv. Încasarea pornește ca venit (chiria ca venit PF), plata ca cheltuială PFA, transferul între conturi proprii rămâne pe Ignoră până îl confirmi. Rândurile din alt an, în altă monedă sau nefinalizate (pending) rămân vizibile, în afara calculului. Pentru persoană fizică, ieșirile nu intră automat la cheltuieli.
+Extrasul se citește pe dispozitiv. Încasarea pornește ca venit, plata ca cheltuială PFA, transferul între conturi proprii rămâne pe Ignoră până îl confirmi. O încasare care pomenește chirie devine venit PF doar dacă depui și ca persoană fizică; pe rolul PFA rămâne venit PFA, cu o notă. Rândurile din alt an, în altă monedă sau nefinalizate (pending) rămân vizibile, în afara calculului. Pentru persoană fizică, ieșirile nu intră automat la cheltuieli.
 
 **Nu este inclus:** conectare la bancă (Open Banking), depunere automată ANAF/SPV.
 

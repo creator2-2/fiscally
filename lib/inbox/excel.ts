@@ -26,6 +26,7 @@ export function parseWorkbook(
   fileName: string,
   fallbackClass: EvidenceClass,
   year?: number,
+  includesPf = false,
 ): ExcelParseResult {
   const wb = XLSX.read(data, { type: "array", cellDates: true });
   const sheetName = wb.SheetNames[0];
@@ -34,7 +35,7 @@ export function parseWorkbook(
   }
   for (const name of wb.SheetNames) {
     const matrix = sheetToMatrix(wb.Sheets[name]);
-    const bank = parseBankMatrix(matrix, fileName, fallbackClass, year);
+    const bank = parseBankMatrix(matrix, fileName, fallbackClass, year, includesPf);
     if (!bank) continue;
     return {
       sheet: name,

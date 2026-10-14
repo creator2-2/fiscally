@@ -33,12 +33,15 @@ describe("bank statement inbox", () => {
         [1200, "pfa-expense", "2026-02-03"],
         [15, "pfa-expense", "2026-02-15"],
         [500, "ignore", "2026-03-20"],
-        [2000, "pf-income", "2026-04-02"],
+        [2000, "pfa-income", "2026-04-02"],
         [900, "ignore", "2025-01-10"],
       ],
     );
     assert.match(parsed.candidates[3].hint ?? "", /conturi proprii/);
+    assert.match(parsed.candidates[4].hint ?? "", /venit PFA/);
     assert.match(parsed.candidates[5].hint ?? "", /2026/);
+    const asPf = csvToCandidates(BT, "extras-bt-2026.csv", "pfa-income", 2026, true);
+    assert.equal(asPf.candidates[4].classification, "pf-income");
     assert.equal(parsed.candidates[0].source, "bank");
   });
 
@@ -156,15 +159,16 @@ CARD_PAYMENT,Current,2026-04-03 08:00:00,2026-04-03 08:00:00,Pending cafe,-12.00
     const parsed = csvToCandidates(BT, "extras-bt-2026.csv", "pfa-income", 2026);
     const valid = parsed.candidates.filter((c) => c.classification !== "ignore" && c.amount > 0);
     const flow = applyCandidatesToFlow({ ...defaultDuFlow(), role: "pfa", year: 2026 }, valid);
-    assert.equal(flow.pfaIncome, 4500);
+    assert.equal(flow.pfaIncome, 6500);
     assert.equal(flow.pfaExpenses, 1215);
-    assert.equal(flow.pfOtherIncome, 2000);
+    assert.equal(flow.pfOtherIncome, 0);
     assert.equal(flow.evidence[0].kind, "bank");
     const draft = flowToD212(defaultProfile, flow);
+    assert.equal(draft.income.value, 6500);
     assert.equal(draft.income.source, "imported");
     assert.equal(draft.expenses.source, "imported");
     assert.match(draft.expenses.note ?? "", /extras/);
-    assert.equal(draft.pfOtherIncome.source, "imported");
+    assert.notEqual(draft.pfOtherIncome.source, "imported");
     const fee = flow.evidence.find((e) => e.total === 15);
     assert.ok(fee);
     const removed = removeEvidenceFromFlow(flow, fee.id);

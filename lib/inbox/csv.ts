@@ -8,6 +8,7 @@ export function csvToCandidates(
   fileName: string,
   fallbackClass: EvidenceClass,
   year?: number,
+  includesPf = false,
 ): {
   candidates: IngestCandidate[];
   headers?: string[];
@@ -15,7 +16,7 @@ export function csvToCandidates(
   needsMapping: boolean;
   bank?: boolean;
 } {
-  const bank = parseBankStatement(text, fileName, fallbackClass, year);
+  const bank = parseBankStatement(text, fileName, fallbackClass, year, includesPf);
   if (bank) {
     return { needsMapping: false, bank: true, candidates: bank.candidates };
   }

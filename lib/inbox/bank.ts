@@ -206,6 +206,7 @@ function classifyMovement(
   description: string,
   typeRaw: string,
   fallbackIncome: EvidenceClass,
+  includesPf: boolean,
 ): { classification: EvidenceClass; hint?: string; confidence: number } {
   const blob = fold(`${description} ${typeRaw}`);
   if (OWN_ACCOUNT.test(blob)) {
@@ -216,10 +217,17 @@ function classifyMovement(
     };
   }
   if (direction === "in" && RENT.test(blob)) {
+    if (includesPf || fallbackIncome === "pf-income") {
+      return {
+        classification: "pf-income",
+        hint: "Menționează chirie. Verifică dacă e venit de persoană fizică.",
+        confidence: 0.74,
+      };
+    }
     return {
-      classification: "pf-income",
-      hint: "Menționează chirie. Verifică dacă e venit de persoană fizică.",
-      confidence: 0.74,
+      classification: fallbackIncome,
+      hint: "Menționează chirie. Pe rolul PFA intră la venit PFA. Pentru venit personal, alege rolul Ambele și clasificarea Venit PF.",
+      confidence: 0.7,
     };
   }
   if (direction === "in") {
@@ -245,6 +253,7 @@ export function parseBankMatrix(
   fileName: string,
   fallbackIncome: EvidenceClass,
   year?: number,
+  includesPf = false,
 ): BankParseResult | null {
   const found = findBankHeader(matrix);
   if (!found) return null;
@@ -291,7 +300,7 @@ export function parseBankMatrix(
     const outside = Boolean(year && date && !date.startsWith(String(year)));
 
     const push = (direction: "in" | "out", amount: number, label: string, suffix: string) => {
-      const base = classifyMovement(direction, description, typeRaw, fallbackIncome);
+      const base = classifyMovement(direction, description, typeRaw, fallbackIncome, includesPf);
       let classification = base.classification;
       let hint = base.hint;
       if (pending) {
@@ -356,6 +365,7 @@ export function parseBankStatement(
   fileName: string,
   fallbackIncome: EvidenceClass,
   year?: number,
+  includesPf = false,
 ): BankParseResult | null {
-  return parseBankMatrix(parseDelimited(text), fileName, fallbackIncome, year);
+  return parseBankMatrix(parseDelimited(text), fileName, fallbackIncome, year, includesPf);
 }
