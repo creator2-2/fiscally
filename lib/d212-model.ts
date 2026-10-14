@@ -168,6 +168,18 @@ export function draftToProfile(profile: Profile, draft: D212Draft): Profile {
 export function flowToD212(profile: Profile, flow: DuFlowState, previous?: D212Draft | null): D212Draft {
   const base = previous ?? emptyD212(profile, flow.year);
   const imported = flow.evidence.some((e) => e.kind === "csv" || e.kind === "smartbill");
+  const expenseEvidence = flow.evidence.some((e) => e.classification === "pfa-expense");
+  const bankExpense = flow.evidence.some((e) => e.kind === "bank" && e.classification === "pfa-expense");
+  const ocrExpense = flow.evidence.some((e) => e.kind === "ocr" && e.classification === "pfa-expense");
+  const expenseNote = bankExpense && ocrExpense
+    ? "Din extras bancar și chitanțe confirmate + ajustări manuale"
+    : bankExpense
+      ? "Din extrasul bancar confirmat + ajustări manuale"
+      : ocrExpense
+        ? "Din chitanțe confirmate (OCR) + ajustări manuale"
+        : expenseEvidence
+          ? "Din liniile confirmate în inbox + ajustări manuale"
+          : base.expenses.note;
   return {
     ...base,
     year: flow.year,
@@ -197,12 +209,8 @@ export function flowToD212(profile: Profile, flow: DuFlowState, previous?: D212D
     expenses: {
       ...base.expenses,
       value: flow.pfaExpenses,
-      source: flow.evidence.some((e) => e.kind === "ocr" && e.classification === "pfa-expense")
-        ? "imported"
-        : base.expenses.source,
-      note: flow.evidence.some((e) => e.kind === "ocr" && e.classification === "pfa-expense")
-        ? "Din chitanțe confirmate (OCR) + ajustări manuale"
-        : base.expenses.note,
+      source: expenseEvidence ? "imported" : base.expenses.source,
+      note: expenseNote,
     },
     pfRentalIncome: {
       ...base.pfRentalIncome,
@@ -212,7 +220,9 @@ export function flowToD212(profile: Profile, flow: DuFlowState, previous?: D212D
     pfOtherIncome: {
       ...base.pfOtherIncome,
       value: flow.pfOtherIncome,
-      source: flow.evidence.some((e) => e.kind === "ocr" && e.classification === "pf-income")
+      source: flow.evidence.some(
+        (e) => (e.kind === "ocr" || e.kind === "bank") && e.classification === "pf-income",
+      )
         ? "imported"
         : flow.pfOtherIncome
           ? "manual"

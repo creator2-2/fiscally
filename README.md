@@ -16,7 +16,7 @@ Ruta `/pregateste-du`. CTA-ul principal de pe Landing și Acasă.
 
 1. Cine depune: PF / PFA (servicii, IT, liberal) / Ambele
 2. An fiscal + CUI / CNP
-3. Inbox dovezi **Încarcă orice**: poze, PDF, CSV, Excel, JSON, text + linie manuală, apoi confirmare în lot. SmartBill rămâne opțional. Banca e **în curând**.
+3. Inbox dovezi **Încarcă orice**: poze, PDF, CSV, Excel, JSON, text, extras de cont (CSV/Excel) + linie manuală, apoi confirmare în lot. SmartBill rămâne opțional.
 4. Calcul automat: PFA sistem real (motor existent) + PF chirii / alte venituri (ipoteze 2026, etichetate)
 5. Revizuire editabilă
 6. Dosar gata → cadru ANAF (link oficial + JSON/PDF precompletat) + checklist SPV
@@ -33,8 +33,9 @@ Starea fluxului stă în `localStorage` (`fiscally.duFlow.v1`). Exportul PDF ră
 | --- | --- |
 | jpg / png / webp | OCR Tesseract (local) |
 | PDF | text PDF.js și/sau OCR prima pagină |
-| CSV | parser facturi existent sau tabel generic |
-| xlsx / xls | foaia 1 → rânduri; mapare coloane dacă antetul e neclar |
+| CSV | parser facturi existent, extras bancar sau tabel generic |
+| CSV / Excel extras | Debit + Credit, sau Sumă + Sold → încasări și plăți de confirmat |
+| xlsx / xls | extras bancar dacă antetul se potrivește; altfel foaia 1, cu mapare dacă antetul e neclar |
 | JSON / txt | sume + date simple sau un TOTAL de factură |
 | Linie manuală | sumă, dată, descriere, tip — fără fișier |
 
@@ -47,8 +48,11 @@ Exemple sintetice (fără date personale):
 - `public/examples/dovezi-2026.xlsx`
 - `public/examples/factura-demo.pdf`
 - `public/examples/dovezi-demo.json`
+- `public/examples/extras-bt-2026.csv`
 
-**Nu este inclus:** Open Banking / extras bancar (rămâne „în curând”), depunere automată ANAF/SPV.
+Extrasul se citește pe dispozitiv. Încasarea pornește ca venit (chiria ca venit PF), plata ca cheltuială PFA, transferul între conturi proprii rămâne pe Ignoră până îl confirmi. Rândurile din alt an, în altă monedă sau nefinalizate (pending) rămân vizibile, în afara calculului. Pentru persoană fizică, ieșirile nu intră automat la cheltuieli.
+
+**Nu este inclus:** conectare la bancă (Open Banking), depunere automată ANAF/SPV.
 
 OCR **poate greși**. Verifică înainte de SPV.
 
@@ -153,7 +157,7 @@ A Romanian-language guide to prepare **Declarația unică (D212)** for individua
 - Sfat fiscal sau juridic autorizat
 - Sincronizare cloud / multi-device
 - OCR perfect pe orice chitanță (editarea e parte din flux)
-- Open Banking / extras bancar automat
+- Open Banking / login la bancă (extrasul se încarcă manual, ca fișier)
 
 ---
 

@@ -23,6 +23,22 @@ const EXAMPLES = [
   { href: "/examples/factura-demo.pdf", name: "factura-demo.pdf" },
 ];
 
+const BANK_EXAMPLE = {
+  href: "/examples/extras-bt-2026.csv",
+  name: "extras-bt-2026.csv",
+};
+
+const SOURCE_LABELS: Record<IngestCandidate["source"], string> = {
+  ocr: "poză",
+  pdf: "pdf",
+  csv: "csv",
+  xlsx: "excel",
+  txt: "text",
+  json: "json",
+  manual: "manual",
+  bank: "extras",
+};
+
 export function UniversalInbox({
   flow,
   role,
@@ -78,6 +94,14 @@ export function UniversalInbox({
 
   async function loadExamples(all = true) {
     const list = all ? EXAMPLES : EXAMPLES.slice(0, 1);
+    await loadNamed(list);
+  }
+
+  async function loadBankExample() {
+    await loadNamed([BANK_EXAMPLE]);
+  }
+
+  async function loadNamed(list: { href: string; name: string }[]) {
     onBusy("inbox");
     try {
       const files: File[] = [];
@@ -86,6 +110,11 @@ export function UniversalInbox({
         if (!res.ok) continue;
         const blob = await res.blob();
         files.push(new File([blob], ex.name, { type: blob.type || guessType(ex.name) }));
+      }
+      if (!files.length) {
+        onBusy(null);
+        onMessage({ ok: false, text: "Nu am putut încărca exemplele." });
+        return;
       }
       await ingest(files);
     } catch {
@@ -177,8 +206,9 @@ export function UniversalInbox({
         <p className="text-[11px] font-semibold uppercase tracking-wide text-sage">Încarcă orice</p>
         <h3 className="mt-1 font-display text-2xl text-ink">Inbox universal de dovezi</h3>
         <p className="mt-1 max-w-2xl text-sm text-ink-soft">
-          Trage aici poze, PDF, CSV, Excel, JSON sau text. Parsarea e locală — nu trimitem fișiere
-          către terți. Confirmă fiecare linie. Banca rămâne în curând. Nu depunem la ANAF.
+          Trage aici poze, PDF, CSV, Excel, JSON, text sau un extras de cont. Parsarea e locală —
+          fișierul rămâne pe dispozitiv, fără login la bancă. Confirmă fiecare linie. Nu depunem la
+          ANAF.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <label className="inline-flex cursor-pointer rounded-full bg-sage px-4 py-2 text-sm font-semibold text-white">
@@ -227,6 +257,14 @@ export function UniversalInbox({
           >
             Doar CSV exemplu
           </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void loadBankExample()}
+            className="rounded-full border border-sage/40 bg-mint-soft px-4 py-2 text-sm font-semibold text-sage-deep disabled:opacity-50"
+          >
+            Exemplu extras bancar
+          </button>
           <label className="inline-flex cursor-pointer rounded-full border border-sage/40 bg-mint-soft px-4 py-2 text-sm font-semibold text-sage-deep">
             Adaugă încă
             <input
@@ -244,7 +282,8 @@ export function UniversalInbox({
           </label>
         </div>
         <p className="mt-3 text-xs text-ink-soft">
-          Acceptate: jpg, png, webp, PDF, CSV, xlsx/xls, JSON, txt. Max. 8 MB / fișier.
+          Acceptate: jpg, png, webp, PDF, CSV, xlsx/xls, JSON, txt, extras CSV/Excel (Debit și Credit,
+          sau Sumă și Sold). Max. 8 MB / fișier.
         </p>
         {progress ? (
           <div className="mt-4 rounded-2xl bg-mint-soft px-3 py-2 text-sm text-sage-deep">
@@ -339,7 +378,7 @@ export function UniversalInbox({
                     />
                   ) : (
                     <div className="flex h-24 items-center justify-center rounded-xl border border-line bg-white text-xs text-ink-soft">
-                      {item.source}
+                      {SOURCE_LABELS[item.source]}
                     </div>
                   )}
                   <div className="grid gap-2 sm:grid-cols-2">
@@ -374,6 +413,7 @@ export function UniversalInbox({
                   {item.fileName} · {Math.round(item.confidence * 100)}%
                   {item.amount ? ` · ${formatRon(item.amount, true)}` : ""}
                 </p>
+                {item.hint ? <p className="mt-1 text-xs text-ink-soft">{item.hint}</p> : null}
                 {item.error ? <p className="mt-1 text-xs text-overdue">{item.error}</p> : null}
                 {item.needsMapping && item.headers ? (
                   <ColumnMapper headers={item.headers} onApply={(map) => applyMap(item, map)} />

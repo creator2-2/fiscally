@@ -1,4 +1,5 @@
 import { parseInvoiceCsv } from "../smartbill/csv";
+import { parseBankStatement } from "./bank";
 import type { EvidenceClass, IngestCandidate } from "./types";
 import { guessColumnMap, parseCsvTable, rowsToCandidates } from "./tabular";
 
@@ -6,7 +7,18 @@ export function csvToCandidates(
   text: string,
   fileName: string,
   fallbackClass: EvidenceClass,
-): { candidates: IngestCandidate[]; headers?: string[]; rows?: string[][]; needsMapping: boolean } {
+  year?: number,
+): {
+  candidates: IngestCandidate[];
+  headers?: string[];
+  rows?: string[][];
+  needsMapping: boolean;
+  bank?: boolean;
+} {
+  const bank = parseBankStatement(text, fileName, fallbackClass, year);
+  if (bank) {
+    return { needsMapping: false, bank: true, candidates: bank.candidates };
+  }
   try {
     const invoices = parseInvoiceCsv(text);
     return {

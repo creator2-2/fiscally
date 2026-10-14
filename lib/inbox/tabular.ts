@@ -71,7 +71,34 @@ export function rowsToCandidates(
     .filter((c) => c.amount > 0 || c.description);
 }
 
-export function splitCsvLine(line: string): string[] {
+export type CsvDelimiter = "," | ";" | "\t";
+
+/** Pick one delimiter so Romanian decimals (1.250,50) survive in semicolon exports. */
+export function detectDelimiter(text: string): CsvDelimiter {
+  const sample = text.replace(/^\uFEFF/, "").split(/\r?\n/).slice(0, 20).join("\n");
+  const counts: Record<CsvDelimiter, number> = { ";": 0, "\t": 0, ",": 0 };
+  let inQuotes = false;
+  for (let i = 0; i < sample.length; i += 1) {
+    const ch = sample[i];
+    if (ch === '"') {
+      if (inQuotes && sample[i + 1] === '"') i += 1;
+      else inQuotes = !inQuotes;
+      continue;
+    }
+    if (!inQuotes && (ch === "," || ch === ";" || ch === "\t")) counts[ch] += 1;
+  }
+  let best: CsvDelimiter = ",";
+  let bestCount = 0;
+  for (const delimiter of [";", "\t", ","] as const) {
+    if (counts[delimiter] > bestCount) {
+      best = delimiter;
+      bestCount = counts[delimiter];
+    }
+  }
+  return best;
+}
+
+export function splitCsvLine(line: string, delimiter: CsvDelimiter = ","): string[] {
   const out: string[] = [];
   let cur = "";
   let inQuotes = false;
@@ -84,7 +111,7 @@ export function splitCsvLine(line: string): string[] {
       } else {
         inQuotes = !inQuotes;
       }
-    } else if ((ch === "," || ch === ";" || ch === "\t") && !inQuotes) {
+    } else if (ch === delimiter && !inQuotes) {
       out.push(cur);
       cur = "";
     } else {
@@ -95,14 +122,18 @@ export function splitCsvLine(line: string): string[] {
   return out.map((c) => c.trim());
 }
 
-export function parseCsvTable(text: string): { headers: string[]; rows: string[][] } {
-  const lines = text
-    .replace(/^\uFEFF/, "")
+export function parseDelimited(text: string): string[][] {
+  const body = text.replace(/^\uFEFF/, "");
+  const delimiter = detectDelimiter(body);
+  return body
     .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
-  if (!lines.length) return { headers: [], rows: [] };
-  const headers = splitCsvLine(lines[0]);
-  const rows = lines.slice(1).map(splitCsvLine);
-  return { headers, rows };
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => splitCsvLine(line, delimiter));
+}
+
+export function parseCsvTable(text: string): { headers: string[]; rows: string[][] } {
+  const matrix = parseDelimited(text);
+  if (!matrix.length) return { headers: [], rows: [] };
+  return { headers: matrix[0], rows: matrix.slice(1) };
 }

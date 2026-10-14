@@ -1,0 +1,12 @@
+Extras de cont
+Titular;PFA Demo Fiscally
+IBAN;RO49XXXX0000000000000000
+Perioada;01.01.2026 - 31.12.2026
+
+Data tranzactie;Data valuta;Descriere;Referinta;Debit;Credit;Sold
+12.01.2026;13.01.2026;Incasare factura F-12;REF1;;4.500,00;4.500,00
+03.02.2026;03.02.2026;Plata chirie spatiu;REF2;1.200,00;;3.300,00
+15.02.2026;15.02.2026;Comision administrare cont;REF3;15,00;;3.285,00
+20.03.2026;20.03.2026;Transfer intre conturi proprii;REF4;500,00;;2.785,00
+02.04.2026;02.04.2026;Incasare chirie apartament;REF5;;2.000,00;4.785,00
+10.01.2025;10.01.2025;Incasare an anterior;REF0;;900,00;900,00
