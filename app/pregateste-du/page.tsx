@@ -271,8 +271,9 @@ export default function PregatesteDuPage() {
         <section className="space-y-4">
           <p className="text-sm text-ink-soft">
             Inbox de dovezi pentru {duFlow.year}. Încarcă orice dovadă (poză, PDF, CSV, Excel, JSON,
-            text) sau adaugă o linie manual. Confirmă înainte să intre în calcul. SmartBill rămâne o
-            cale separată. Banca e în curând. Nu depunem la ANAF.
+            text, extras de cont) sau adaugă o linie manual. Confirmă înainte să intre în calcul.
+            SmartBill rămâne o cale separată. Extrasul se citește pe dispozitiv, fără login la bancă.
+            Nu depunem la ANAF.
           </p>
 
           <UniversalInbox
@@ -378,7 +379,15 @@ export default function PregatesteDuPage() {
             </article>
           ) : null}
 
-          <SoonCard title="Conexiune bancă" text="Extras automat de încasări — în curând." />
+          <article className="rounded-3xl border border-line bg-white p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-sage">Extras de cont</p>
+            <h3 className="mt-1 font-display text-xl text-ink">Extras de cont, ca fișier</h3>
+            <p className="mt-1 text-sm text-ink-soft">
+              CSV sau Excel din BT, ING, Revolut, BCR sau Raiffeisen, citit pe dispozitiv. Încasările
+              pornesc ca venit, plățile ca cheltuială PFA, transferurile între conturi proprii rămân
+              de verificat. Confirmă în inboxul de mai sus înainte să intre în calcul.
+            </p>
+          </article>
 
           {duFlow.evidence.length ? (
             <ul className="space-y-2">
@@ -407,7 +416,7 @@ export default function PregatesteDuPage() {
           ) : (
             <EmptyState
               title="Nicio dovadă confirmată"
-              text="Încarcă fișiere sau adaugă o linie, apoi confirmă. Banca rămâne în curând."
+              text="Încarcă fișiere, un extras de cont sau adaugă o linie, apoi confirmă."
             />
           )}
         </section>
@@ -484,11 +493,23 @@ export default function PregatesteDuPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <Labeled
                 label="Venituri PFA"
-                source={duFlow.evidence.some((e) => e.kind === "csv" || e.kind === "smartbill") ? "imported" : "manual"}
+                source={
+                  duFlow.evidence.some(
+                    (e) =>
+                      e.classification === "pfa-income" || e.kind === "csv" || e.kind === "smartbill",
+                  )
+                    ? "imported"
+                    : "manual"
+                }
               >
                 <MoneyInput value={duFlow.pfaIncome} onValue={(pfaIncome) => patchDuFlow({ pfaIncome })} />
               </Labeled>
-              <Labeled label="Cheltuieli PFA" source="manual">
+              <Labeled
+                label="Cheltuieli PFA"
+                source={
+                  duFlow.evidence.some((e) => e.classification === "pfa-expense") ? "imported" : "manual"
+                }
+              >
                 <MoneyInput
                   value={duFlow.pfaExpenses}
                   onValue={(pfaExpenses) => patchDuFlow({ pfaExpenses })}
@@ -634,22 +655,5 @@ function Labeled({
       </div>
       {children}
     </div>
-  );
-}
-
-function SoonCard({ title, text }: { title: string; text: string }) {
-  return (
-    <article className="rounded-3xl border border-dashed border-line bg-paper/60 p-4 opacity-80">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">În curând</p>
-      <h3 className="mt-1 font-display text-xl text-ink">{title}</h3>
-      <p className="mt-1 text-sm text-ink-soft">{text}</p>
-      <button
-        type="button"
-        disabled
-        className="mt-3 rounded-full border border-line px-3 py-1.5 text-xs font-semibold text-ink-soft"
-      >
-        Indisponibil
-      </button>
-    </article>
   );
 }

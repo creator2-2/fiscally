@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { parseBankMatrix } from "./bank";
 import type { ColumnMap, EvidenceClass, IngestCandidate } from "./types";
 import { guessColumnMap, rowsToCandidates } from "./tabular";
 
@@ -24,11 +25,25 @@ export function parseWorkbook(
   data: ArrayBuffer,
   fileName: string,
   fallbackClass: EvidenceClass,
+  year?: number,
+  includesPf = false,
 ): ExcelParseResult {
   const wb = XLSX.read(data, { type: "array", cellDates: true });
   const sheetName = wb.SheetNames[0];
   if (!sheetName) {
     throw new Error("Registrul Excel nu are nicio foaie.");
+  }
+  for (const name of wb.SheetNames) {
+    const matrix = sheetToMatrix(wb.Sheets[name]);
+    const bank = parseBankMatrix(matrix, fileName, fallbackClass, year, includesPf);
+    if (!bank) continue;
+    return {
+      sheet: name,
+      headers: bank.headers,
+      rows: bank.rows,
+      map: { amount: 0, date: 0, description: null, tip: null },
+      candidates: bank.candidates,
+    };
   }
   const matrix = sheetToMatrix(wb.Sheets[sheetName]);
   if (matrix.length < 2) {

@@ -2,7 +2,7 @@
 
 import { recognizeFile } from "../ocr/run";
 import { suggestedIncomeClassification, suggestedOcrClassification } from "../ocr/apply";
-import type { FilerRole } from "../du-flow";
+import { includesPf, type FilerRole } from "../du-flow";
 import { csvToCandidates } from "./csv";
 import { assertFileSize, routeErrorMessage, routeFile } from "./route";
 import { parseJsonEvidence, parsePlainTextEvidence } from "./text";
@@ -96,15 +96,15 @@ async function ingestOne(
 
   if (route === "csv") {
     const text = await file.text();
-    const parsed = csvToCandidates(text, file.name, incomeClass(role));
-    if (!year) return parsed.candidates;
+    const parsed = csvToCandidates(text, file.name, incomeClass(role), year, includesPf(role));
+    if (parsed.bank || !year) return parsed.candidates;
     return parsed.candidates.filter((c) => !c.date || c.date.startsWith(String(year)));
   }
 
   if (route === "xlsx") {
     const { parseWorkbook } = await import("./excel");
     const data = await file.arrayBuffer();
-    const parsed = parseWorkbook(data, file.name, incomeClass(role));
+    const parsed = parseWorkbook(data, file.name, incomeClass(role), year, includesPf(role));
     if (!parsed.map) {
       return [
         {

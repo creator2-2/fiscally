@@ -1,7 +1,7 @@
 import type { OcrClassification } from "../ocr/types";
 
 export type EvidenceClass = OcrClassification;
-export type IngestSource = "ocr" | "pdf" | "csv" | "xlsx" | "txt" | "json" | "manual";
+export type IngestSource = "ocr" | "pdf" | "csv" | "xlsx" | "txt" | "json" | "manual" | "bank";
 export type FileRoute = IngestSource | "image" | "unknown";
 
 export interface IngestCandidate {
@@ -13,6 +13,7 @@ export interface IngestCandidate {
   description: string;
   classification: EvidenceClass;
   confidence: number;
+  hint?: string;
   rawText?: string;
   previewUrl?: string;
   error?: string;
